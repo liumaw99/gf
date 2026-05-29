@@ -1,27 +1,58 @@
 package app
 
 import (
-	"log/slog"
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/config"
+	"github.com/lagom/lagom-server/internal/handler"
+	"github.com/lagom/lagom-server/internal/middleware"
 )
 
-// setupRouter 配置路由
-func setupRouter(log *slog.Logger) *gin.Engine {
+// setupRouter 配置基础路由（无 handler 注入）
+func setupRouter(cfg *config.Config) *gin.Engine {
 	router := gin.New()
-
-	// 全局中间件
 	router.Use(gin.Recovery())
-	router.Use(requestLogger(log))
-	router.Use(corsMiddleware())
+	router.Use(requestLogger())
+	router.Use(middleware.CORS())
 
-	// 健康检查
 	router.GET("/health", healthHandler)
 	router.GET("/ready", readinessHandler)
 
-	// API v1
+	api := router.Group("/api/v1")
+	{
+		api.GET("/ping", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "pong"})
+		})
+	}
+
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code":    404,
+			"message": "endpoint not found",
+		})
+	})
+
+	return router
+}
+
+// setupWireRouter 配置完整路由（Wire 注入 handler）
+func setupWireRouter(
+	cfg *config.Config,
+	authHandler *handler.AuthHandler,
+	chatHandler *handler.ChatHandler,
+	habitHandler *handler.HabitHandler,
+	characterHandler *handler.CharacterHandler,
+) *gin.Engine {
+	router := gin.New()
+	router.Use(gin.Recovery())
+	router.Use(requestLogger())
+	router.Use(middleware.CORS())
+
+	router.GET("/health", healthHandler)
+	router.GET("/ready", readinessHandler)
+
 	api := router.Group("/api/v1")
 	{
 		// 公开路由
@@ -29,23 +60,33 @@ func setupRouter(log *slog.Logger) *gin.Engine {
 			c.JSON(http.StatusOK, gin.H{"message": "pong"})
 		})
 
-		// TODO: 认证路由
-		// auth := api.Group("/auth")
-		// {
-		//     auth.POST("/apple", authHandler.AppleSignIn)
-		//     auth.POST("/google", authHandler.GoogleSignIn)
-		// }
+		auth := api.Group("/auth")
+		{
+			auth.POST("/apple", authHandler.AppleSignIn)
+			auth.POST("/google", authHandler.GoogleSignIn)
+			auth.POST("/refresh", authHandler.RefreshToken)
+		}
 
-		// TODO: 需要认证的路由
-		// authorized := api.Group("")
-		// authorized.Use(middleware.JWTAuth(cfg.JWT.Secret))
-		// {
-		//     authorized.POST("/chat", chatHandler.Chat)
-		//     authorized.GET("/habits", habitHandler.List)
-		// }
+		// 需要认证的路由
+		authorized := api.Group("")
+		authorized.Use(middleware.JWTAuth(cfg.JWT.Secret))
+		{
+			authorized.POST("/chat", chatHandler.Chat)
+			authorized.GET("/chat/history", chatHandler.GetHistory)
+
+			authorized.GET("/habits", habitHandler.List)
+			authorized.POST("/habits", habitHandler.Create)
+			authorized.POST("/habits/:id/complete", habitHandler.Complete)
+
+			authorized.GET("/characters", characterHandler.List)
+			authorized.GET("/characters/:id", characterHandler.GetDetail)
+			authorized.POST("/characters/recommend", characterHandler.Recommend)
+			authorized.GET("/user/characters", characterHandler.GetUserCharacters)
+			authorized.POST("/user/characters", characterHandler.SelectCharacter)
+			authorized.POST("/user/characters/:id/switch", characterHandler.SwitchCharacter)
+		}
 	}
 
-	// 404 处理
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    404,
@@ -66,7 +107,6 @@ func healthHandler(c *gin.Context) {
 
 // readinessHandler 就绪检查
 func readinessHandler(c *gin.Context) {
-	// TODO: 检查数据库、Redis 等依赖
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "ready",
 		"service": "lagom-server",
@@ -78,46 +118,15 @@ func readinessHandler(c *gin.Context) {
 }
 
 // requestLogger 请求日志中间件
-func requestLogger(log *slog.Logger) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		start := time.Now()
-		c.Next()
-
-		attrs := []any{
-			"status", c.Writer.Status(),
-			"method", c.Request.Method,
-			"path", c.Request.URL.Path,
-			"client_ip", c.ClientIP(),
-			"latency", time.Since(start),
-			"bytes", c.Writer.Size(),
-		}
-
-		if len(c.Errors) > 0 {
-			attrs = append(attrs, "errors", c.Errors.String())
-		}
-
-		if c.Writer.Status() >= http.StatusInternalServerError {
-			log.Error("request completed", attrs...)
-			return
-		}
-
-		log.Info("request completed", attrs...)
-	}
-}
-
-// corsMiddleware CORS 中间件
-func corsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-
-		c.Next()
-	}
+func requestLogger() gin.HandlerFunc {
+	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		return fmt.Sprintf("%s | %3d | %13v | %15s | %-7s %s\n",
+			param.TimeStamp.Format("2006-01-02 15:04:05"),
+			param.StatusCode,
+			param.Latency,
+			param.ClientIP,
+			param.Method,
+			param.Path,
+		)
+	})
 }

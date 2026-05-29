@@ -4,16 +4,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/service"
 )
 
 // HabitHandler 习惯处理器
 type HabitHandler struct {
-	// TODO: inject habit service
+	svc *service.HabitService
 }
 
 // NewHabitHandler 创建习惯处理器
-func NewHabitHandler() *HabitHandler {
-	return &HabitHandler{}
+func NewHabitHandler(svc *service.HabitService) *HabitHandler {
+	return &HabitHandler{svc: svc}
 }
 
 // List 获取习惯列表

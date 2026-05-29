@@ -4,16 +4,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/service"
 )
 
 // ChatHandler 对话处理器
 type ChatHandler struct {
-	// TODO: inject AI service
+	svc *service.AIService
 }
 
 // NewChatHandler 创建对话处理器
-func NewChatHandler() *ChatHandler {
-	return &ChatHandler{}
+func NewChatHandler(svc *service.AIService) *ChatHandler {
+	return &ChatHandler{svc: svc}
 }
 
 // Chat 流式对话（SSE）

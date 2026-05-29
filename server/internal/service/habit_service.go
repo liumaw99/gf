@@ -1,18 +1,25 @@
 package service
 
-import "context"
+import (
+	"context"
+
+	"github.com/lagom/lagom-server/config"
+	"github.com/lagom/lagom-server/ent"
+)
 
 // HabitService 习惯服务
-type HabitService struct{}
+type HabitService struct {
+	cfg    *config.Config
+	client *ent.Client
+}
 
 // NewHabitService 创建习惯服务
-func NewHabitService() *HabitService {
-	return &HabitService{}
+func NewHabitService(cfg *config.Config, client *ent.Client) *HabitService {
+	return &HabitService{cfg: cfg, client: client}
 }
 
 // GeneratePlan 生成习惯计划
 func (s *HabitService) GeneratePlan(ctx context.Context, goal string) error {
-	// TODO: 调用 AI 生成 21 天渐进计划
 	return nil
 }
 

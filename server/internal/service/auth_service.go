@@ -1,13 +1,21 @@
 package service
 
-import "context"
+import (
+	"context"
+
+	"github.com/lagom/lagom-server/config"
+	"github.com/lagom/lagom-server/ent"
+)
 
 // AuthService 认证服务
-type AuthService struct{}
+type AuthService struct {
+	cfg    *config.Config
+	client *ent.Client
+}
 
 // NewAuthService 创建认证服务
-func NewAuthService() *AuthService {
-	return &AuthService{}
+func NewAuthService(cfg *config.Config, client *ent.Client) *AuthService {
+	return &AuthService{cfg: cfg, client: client}
 }
 
 // AppleSignIn Apple 登录

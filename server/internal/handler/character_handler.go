@@ -4,16 +4,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/service"
 )
 
 // CharacterHandler 名人角色处理器
 type CharacterHandler struct {
-	// TODO: inject character service
+	svc *service.CharacterService
 }
 
 // NewCharacterHandler 创建角色处理器
-func NewCharacterHandler() *CharacterHandler {
-	return &CharacterHandler{}
+func NewCharacterHandler(svc *service.CharacterService) *CharacterHandler {
+	return &CharacterHandler{svc: svc}
 }
 
 // List 获取角色列表

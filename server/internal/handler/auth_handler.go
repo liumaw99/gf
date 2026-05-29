@@ -4,16 +4,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/service"
 )
 
 // AuthHandler 认证处理器
 type AuthHandler struct {
-	// TODO: inject auth service
+	svc *service.AuthService
 }
 
 // NewAuthHandler 创建认证处理器
-func NewAuthHandler() *AuthHandler {
-	return &AuthHandler{}
+func NewAuthHandler(svc *service.AuthService) *AuthHandler {
+	return &AuthHandler{svc: svc}
 }
 
 // AppleSignIn Apple 登录
