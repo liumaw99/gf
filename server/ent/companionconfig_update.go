@@ -19,8 +19,9 @@ import (
 // CompanionConfigUpdate is the builder for updating CompanionConfig entities.
 type CompanionConfigUpdate struct {
 	config
-	hooks    []Hook
-	mutation *CompanionConfigMutation
+	hooks     []Hook
+	mutation  *CompanionConfigMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the CompanionConfigUpdate builder.
@@ -282,6 +283,12 @@ func (_u *CompanionConfigUpdate) defaults() {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *CompanionConfigUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CompanionConfigUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *CompanionConfigUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(companionconfig.Table, companionconfig.Columns, sqlgraph.NewFieldSpec(companionconfig.FieldID, field.TypeUUID))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
@@ -348,6 +355,7 @@ func (_u *CompanionConfigUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(companionconfig.FieldUpdatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{companionconfig.Label}
@@ -363,9 +371,10 @@ func (_u *CompanionConfigUpdate) sqlSave(ctx context.Context) (_node int, err er
 // CompanionConfigUpdateOne is the builder for updating a single CompanionConfig entity.
 type CompanionConfigUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *CompanionConfigMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *CompanionConfigMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -634,6 +643,12 @@ func (_u *CompanionConfigUpdateOne) defaults() {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *CompanionConfigUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CompanionConfigUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *CompanionConfigUpdateOne) sqlSave(ctx context.Context) (_node *CompanionConfig, err error) {
 	_spec := sqlgraph.NewUpdateSpec(companionconfig.Table, companionconfig.Columns, sqlgraph.NewFieldSpec(companionconfig.FieldID, field.TypeUUID))
 	id, ok := _u.mutation.ID()
@@ -717,6 +732,7 @@ func (_u *CompanionConfigUpdateOne) sqlSave(ctx context.Context) (_node *Compani
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(companionconfig.FieldUpdatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &CompanionConfig{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

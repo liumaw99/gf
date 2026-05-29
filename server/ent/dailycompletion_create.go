@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -19,6 +21,7 @@ type DailyCompletionCreate struct {
 	config
 	mutation *DailyCompletionMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetUserID sets the "user_id" field.
@@ -185,6 +188,7 @@ func (_c *DailyCompletionCreate) createSpec() (*DailyCompletion, *sqlgraph.Creat
 		_node = &DailyCompletion{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(dailycompletion.Table, sqlgraph.NewFieldSpec(dailycompletion.FieldID, field.TypeUUID))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
@@ -216,11 +220,342 @@ func (_c *DailyCompletionCreate) createSpec() (*DailyCompletion, *sqlgraph.Creat
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.DailyCompletion.Create().
+//		SetUserID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DailyCompletionUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *DailyCompletionCreate) OnConflict(opts ...sql.ConflictOption) *DailyCompletionUpsertOne {
+	_c.conflict = opts
+	return &DailyCompletionUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.DailyCompletion.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *DailyCompletionCreate) OnConflictColumns(columns ...string) *DailyCompletionUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &DailyCompletionUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// DailyCompletionUpsertOne is the builder for "upsert"-ing
+	//  one DailyCompletion node.
+	DailyCompletionUpsertOne struct {
+		create *DailyCompletionCreate
+	}
+
+	// DailyCompletionUpsert is the "OnConflict" setter.
+	DailyCompletionUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUserID sets the "user_id" field.
+func (u *DailyCompletionUpsert) SetUserID(v uuid.UUID) *DailyCompletionUpsert {
+	u.Set(dailycompletion.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *DailyCompletionUpsert) UpdateUserID() *DailyCompletionUpsert {
+	u.SetExcluded(dailycompletion.FieldUserID)
+	return u
+}
+
+// SetHabitID sets the "habit_id" field.
+func (u *DailyCompletionUpsert) SetHabitID(v uuid.UUID) *DailyCompletionUpsert {
+	u.Set(dailycompletion.FieldHabitID, v)
+	return u
+}
+
+// UpdateHabitID sets the "habit_id" field to the value that was provided on create.
+func (u *DailyCompletionUpsert) UpdateHabitID() *DailyCompletionUpsert {
+	u.SetExcluded(dailycompletion.FieldHabitID)
+	return u
+}
+
+// SetDate sets the "date" field.
+func (u *DailyCompletionUpsert) SetDate(v time.Time) *DailyCompletionUpsert {
+	u.Set(dailycompletion.FieldDate, v)
+	return u
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *DailyCompletionUpsert) UpdateDate() *DailyCompletionUpsert {
+	u.SetExcluded(dailycompletion.FieldDate)
+	return u
+}
+
+// SetCompletedAt sets the "completed_at" field.
+func (u *DailyCompletionUpsert) SetCompletedAt(v time.Time) *DailyCompletionUpsert {
+	u.Set(dailycompletion.FieldCompletedAt, v)
+	return u
+}
+
+// UpdateCompletedAt sets the "completed_at" field to the value that was provided on create.
+func (u *DailyCompletionUpsert) UpdateCompletedAt() *DailyCompletionUpsert {
+	u.SetExcluded(dailycompletion.FieldCompletedAt)
+	return u
+}
+
+// SetQualityScore sets the "quality_score" field.
+func (u *DailyCompletionUpsert) SetQualityScore(v int) *DailyCompletionUpsert {
+	u.Set(dailycompletion.FieldQualityScore, v)
+	return u
+}
+
+// UpdateQualityScore sets the "quality_score" field to the value that was provided on create.
+func (u *DailyCompletionUpsert) UpdateQualityScore() *DailyCompletionUpsert {
+	u.SetExcluded(dailycompletion.FieldQualityScore)
+	return u
+}
+
+// AddQualityScore adds v to the "quality_score" field.
+func (u *DailyCompletionUpsert) AddQualityScore(v int) *DailyCompletionUpsert {
+	u.Add(dailycompletion.FieldQualityScore, v)
+	return u
+}
+
+// ClearQualityScore clears the value of the "quality_score" field.
+func (u *DailyCompletionUpsert) ClearQualityScore() *DailyCompletionUpsert {
+	u.SetNull(dailycompletion.FieldQualityScore)
+	return u
+}
+
+// SetNote sets the "note" field.
+func (u *DailyCompletionUpsert) SetNote(v string) *DailyCompletionUpsert {
+	u.Set(dailycompletion.FieldNote, v)
+	return u
+}
+
+// UpdateNote sets the "note" field to the value that was provided on create.
+func (u *DailyCompletionUpsert) UpdateNote() *DailyCompletionUpsert {
+	u.SetExcluded(dailycompletion.FieldNote)
+	return u
+}
+
+// ClearNote clears the value of the "note" field.
+func (u *DailyCompletionUpsert) ClearNote() *DailyCompletionUpsert {
+	u.SetNull(dailycompletion.FieldNote)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.DailyCompletion.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(dailycompletion.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *DailyCompletionUpsertOne) UpdateNewValues() *DailyCompletionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(dailycompletion.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.DailyCompletion.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *DailyCompletionUpsertOne) Ignore() *DailyCompletionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *DailyCompletionUpsertOne) DoNothing() *DailyCompletionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the DailyCompletionCreate.OnConflict
+// documentation for more info.
+func (u *DailyCompletionUpsertOne) Update(set func(*DailyCompletionUpsert)) *DailyCompletionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&DailyCompletionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *DailyCompletionUpsertOne) SetUserID(v uuid.UUID) *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *DailyCompletionUpsertOne) UpdateUserID() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetHabitID sets the "habit_id" field.
+func (u *DailyCompletionUpsertOne) SetHabitID(v uuid.UUID) *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetHabitID(v)
+	})
+}
+
+// UpdateHabitID sets the "habit_id" field to the value that was provided on create.
+func (u *DailyCompletionUpsertOne) UpdateHabitID() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateHabitID()
+	})
+}
+
+// SetDate sets the "date" field.
+func (u *DailyCompletionUpsertOne) SetDate(v time.Time) *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetDate(v)
+	})
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *DailyCompletionUpsertOne) UpdateDate() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateDate()
+	})
+}
+
+// SetCompletedAt sets the "completed_at" field.
+func (u *DailyCompletionUpsertOne) SetCompletedAt(v time.Time) *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetCompletedAt(v)
+	})
+}
+
+// UpdateCompletedAt sets the "completed_at" field to the value that was provided on create.
+func (u *DailyCompletionUpsertOne) UpdateCompletedAt() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateCompletedAt()
+	})
+}
+
+// SetQualityScore sets the "quality_score" field.
+func (u *DailyCompletionUpsertOne) SetQualityScore(v int) *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetQualityScore(v)
+	})
+}
+
+// AddQualityScore adds v to the "quality_score" field.
+func (u *DailyCompletionUpsertOne) AddQualityScore(v int) *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.AddQualityScore(v)
+	})
+}
+
+// UpdateQualityScore sets the "quality_score" field to the value that was provided on create.
+func (u *DailyCompletionUpsertOne) UpdateQualityScore() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateQualityScore()
+	})
+}
+
+// ClearQualityScore clears the value of the "quality_score" field.
+func (u *DailyCompletionUpsertOne) ClearQualityScore() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.ClearQualityScore()
+	})
+}
+
+// SetNote sets the "note" field.
+func (u *DailyCompletionUpsertOne) SetNote(v string) *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetNote(v)
+	})
+}
+
+// UpdateNote sets the "note" field to the value that was provided on create.
+func (u *DailyCompletionUpsertOne) UpdateNote() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateNote()
+	})
+}
+
+// ClearNote clears the value of the "note" field.
+func (u *DailyCompletionUpsertOne) ClearNote() *DailyCompletionUpsertOne {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.ClearNote()
+	})
+}
+
+// Exec executes the query.
+func (u *DailyCompletionUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for DailyCompletionCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *DailyCompletionUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *DailyCompletionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: DailyCompletionUpsertOne.ID is not supported by MySQL driver. Use DailyCompletionUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *DailyCompletionUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // DailyCompletionCreateBulk is the builder for creating many DailyCompletion entities in bulk.
 type DailyCompletionCreateBulk struct {
 	config
 	err      error
 	builders []*DailyCompletionCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the DailyCompletion entities in the database.
@@ -250,6 +585,7 @@ func (_c *DailyCompletionCreateBulk) Save(ctx context.Context) ([]*DailyCompleti
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -296,6 +632,225 @@ func (_c *DailyCompletionCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *DailyCompletionCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.DailyCompletion.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DailyCompletionUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *DailyCompletionCreateBulk) OnConflict(opts ...sql.ConflictOption) *DailyCompletionUpsertBulk {
+	_c.conflict = opts
+	return &DailyCompletionUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.DailyCompletion.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *DailyCompletionCreateBulk) OnConflictColumns(columns ...string) *DailyCompletionUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &DailyCompletionUpsertBulk{
+		create: _c,
+	}
+}
+
+// DailyCompletionUpsertBulk is the builder for "upsert"-ing
+// a bulk of DailyCompletion nodes.
+type DailyCompletionUpsertBulk struct {
+	create *DailyCompletionCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.DailyCompletion.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(dailycompletion.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *DailyCompletionUpsertBulk) UpdateNewValues() *DailyCompletionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(dailycompletion.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.DailyCompletion.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *DailyCompletionUpsertBulk) Ignore() *DailyCompletionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *DailyCompletionUpsertBulk) DoNothing() *DailyCompletionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the DailyCompletionCreateBulk.OnConflict
+// documentation for more info.
+func (u *DailyCompletionUpsertBulk) Update(set func(*DailyCompletionUpsert)) *DailyCompletionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&DailyCompletionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *DailyCompletionUpsertBulk) SetUserID(v uuid.UUID) *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *DailyCompletionUpsertBulk) UpdateUserID() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetHabitID sets the "habit_id" field.
+func (u *DailyCompletionUpsertBulk) SetHabitID(v uuid.UUID) *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetHabitID(v)
+	})
+}
+
+// UpdateHabitID sets the "habit_id" field to the value that was provided on create.
+func (u *DailyCompletionUpsertBulk) UpdateHabitID() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateHabitID()
+	})
+}
+
+// SetDate sets the "date" field.
+func (u *DailyCompletionUpsertBulk) SetDate(v time.Time) *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetDate(v)
+	})
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *DailyCompletionUpsertBulk) UpdateDate() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateDate()
+	})
+}
+
+// SetCompletedAt sets the "completed_at" field.
+func (u *DailyCompletionUpsertBulk) SetCompletedAt(v time.Time) *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetCompletedAt(v)
+	})
+}
+
+// UpdateCompletedAt sets the "completed_at" field to the value that was provided on create.
+func (u *DailyCompletionUpsertBulk) UpdateCompletedAt() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateCompletedAt()
+	})
+}
+
+// SetQualityScore sets the "quality_score" field.
+func (u *DailyCompletionUpsertBulk) SetQualityScore(v int) *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetQualityScore(v)
+	})
+}
+
+// AddQualityScore adds v to the "quality_score" field.
+func (u *DailyCompletionUpsertBulk) AddQualityScore(v int) *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.AddQualityScore(v)
+	})
+}
+
+// UpdateQualityScore sets the "quality_score" field to the value that was provided on create.
+func (u *DailyCompletionUpsertBulk) UpdateQualityScore() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateQualityScore()
+	})
+}
+
+// ClearQualityScore clears the value of the "quality_score" field.
+func (u *DailyCompletionUpsertBulk) ClearQualityScore() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.ClearQualityScore()
+	})
+}
+
+// SetNote sets the "note" field.
+func (u *DailyCompletionUpsertBulk) SetNote(v string) *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.SetNote(v)
+	})
+}
+
+// UpdateNote sets the "note" field to the value that was provided on create.
+func (u *DailyCompletionUpsertBulk) UpdateNote() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.UpdateNote()
+	})
+}
+
+// ClearNote clears the value of the "note" field.
+func (u *DailyCompletionUpsertBulk) ClearNote() *DailyCompletionUpsertBulk {
+	return u.Update(func(s *DailyCompletionUpsert) {
+		s.ClearNote()
+	})
+}
+
+// Exec executes the query.
+func (u *DailyCompletionUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the DailyCompletionCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for DailyCompletionCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *DailyCompletionUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

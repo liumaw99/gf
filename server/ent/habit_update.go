@@ -20,8 +20,9 @@ import (
 // HabitUpdate is the builder for updating Habit entities.
 type HabitUpdate struct {
 	config
-	hooks    []Hook
-	mutation *HabitMutation
+	hooks     []Hook
+	mutation  *HabitMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the HabitUpdate builder.
@@ -271,6 +272,12 @@ func (_u *HabitUpdate) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *HabitUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *HabitUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *HabitUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -336,6 +343,7 @@ func (_u *HabitUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(habit.FieldUpdatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{habit.Label}
@@ -351,9 +359,10 @@ func (_u *HabitUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 // HabitUpdateOne is the builder for updating a single Habit entity.
 type HabitUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *HabitMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *HabitMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -610,6 +619,12 @@ func (_u *HabitUpdateOne) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *HabitUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *HabitUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *HabitUpdateOne) sqlSave(ctx context.Context) (_node *Habit, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -692,6 +707,7 @@ func (_u *HabitUpdateOne) sqlSave(ctx context.Context) (_node *Habit, err error)
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(habit.FieldUpdatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &Habit{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

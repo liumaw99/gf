@@ -19,8 +19,9 @@ import (
 // DailyCompletionUpdate is the builder for updating DailyCompletion entities.
 type DailyCompletionUpdate struct {
 	config
-	hooks    []Hook
-	mutation *DailyCompletionMutation
+	hooks     []Hook
+	mutation  *DailyCompletionMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the DailyCompletionUpdate builder.
@@ -164,6 +165,12 @@ func (_u *DailyCompletionUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *DailyCompletionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *DailyCompletionUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *DailyCompletionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(dailycompletion.Table, dailycompletion.Columns, sqlgraph.NewFieldSpec(dailycompletion.FieldID, field.TypeUUID))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
@@ -200,6 +207,7 @@ func (_u *DailyCompletionUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if _u.mutation.NoteCleared() {
 		_spec.ClearField(dailycompletion.FieldNote, field.TypeString)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{dailycompletion.Label}
@@ -215,9 +223,10 @@ func (_u *DailyCompletionUpdate) sqlSave(ctx context.Context) (_node int, err er
 // DailyCompletionUpdateOne is the builder for updating a single DailyCompletion entity.
 type DailyCompletionUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *DailyCompletionMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *DailyCompletionMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -368,6 +377,12 @@ func (_u *DailyCompletionUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *DailyCompletionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *DailyCompletionUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *DailyCompletionUpdateOne) sqlSave(ctx context.Context) (_node *DailyCompletion, err error) {
 	_spec := sqlgraph.NewUpdateSpec(dailycompletion.Table, dailycompletion.Columns, sqlgraph.NewFieldSpec(dailycompletion.FieldID, field.TypeUUID))
 	id, ok := _u.mutation.ID()
@@ -421,6 +436,7 @@ func (_u *DailyCompletionUpdateOne) sqlSave(ctx context.Context) (_node *DailyCo
 	if _u.mutation.NoteCleared() {
 		_spec.ClearField(dailycompletion.FieldNote, field.TypeString)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &DailyCompletion{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -19,6 +21,7 @@ type HabitCreate struct {
 	config
 	mutation *HabitMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetUserID sets the "user_id" field.
@@ -320,6 +323,7 @@ func (_c *HabitCreate) createSpec() (*Habit, *sqlgraph.CreateSpec) {
 		_node = &Habit{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(habit.Table, sqlgraph.NewFieldSpec(habit.FieldID, field.TypeUUID))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
@@ -375,11 +379,511 @@ func (_c *HabitCreate) createSpec() (*Habit, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Habit.Create().
+//		SetUserID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.HabitUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *HabitCreate) OnConflict(opts ...sql.ConflictOption) *HabitUpsertOne {
+	_c.conflict = opts
+	return &HabitUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Habit.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *HabitCreate) OnConflictColumns(columns ...string) *HabitUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &HabitUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// HabitUpsertOne is the builder for "upsert"-ing
+	//  one Habit node.
+	HabitUpsertOne struct {
+		create *HabitCreate
+	}
+
+	// HabitUpsert is the "OnConflict" setter.
+	HabitUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUserID sets the "user_id" field.
+func (u *HabitUpsert) SetUserID(v uuid.UUID) *HabitUpsert {
+	u.Set(habit.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateUserID() *HabitUpsert {
+	u.SetExcluded(habit.FieldUserID)
+	return u
+}
+
+// SetTitle sets the "title" field.
+func (u *HabitUpsert) SetTitle(v string) *HabitUpsert {
+	u.Set(habit.FieldTitle, v)
+	return u
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateTitle() *HabitUpsert {
+	u.SetExcluded(habit.FieldTitle)
+	return u
+}
+
+// SetCategory sets the "category" field.
+func (u *HabitUpsert) SetCategory(v string) *HabitUpsert {
+	u.Set(habit.FieldCategory, v)
+	return u
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateCategory() *HabitUpsert {
+	u.SetExcluded(habit.FieldCategory)
+	return u
+}
+
+// SetDescription sets the "description" field.
+func (u *HabitUpsert) SetDescription(v string) *HabitUpsert {
+	u.Set(habit.FieldDescription, v)
+	return u
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateDescription() *HabitUpsert {
+	u.SetExcluded(habit.FieldDescription)
+	return u
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *HabitUpsert) ClearDescription() *HabitUpsert {
+	u.SetNull(habit.FieldDescription)
+	return u
+}
+
+// SetPriority sets the "priority" field.
+func (u *HabitUpsert) SetPriority(v int) *HabitUpsert {
+	u.Set(habit.FieldPriority, v)
+	return u
+}
+
+// UpdatePriority sets the "priority" field to the value that was provided on create.
+func (u *HabitUpsert) UpdatePriority() *HabitUpsert {
+	u.SetExcluded(habit.FieldPriority)
+	return u
+}
+
+// AddPriority adds v to the "priority" field.
+func (u *HabitUpsert) AddPriority(v int) *HabitUpsert {
+	u.Add(habit.FieldPriority, v)
+	return u
+}
+
+// SetFrequencyType sets the "frequency_type" field.
+func (u *HabitUpsert) SetFrequencyType(v string) *HabitUpsert {
+	u.Set(habit.FieldFrequencyType, v)
+	return u
+}
+
+// UpdateFrequencyType sets the "frequency_type" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateFrequencyType() *HabitUpsert {
+	u.SetExcluded(habit.FieldFrequencyType)
+	return u
+}
+
+// SetTargetDays sets the "target_days" field.
+func (u *HabitUpsert) SetTargetDays(v []int) *HabitUpsert {
+	u.Set(habit.FieldTargetDays, v)
+	return u
+}
+
+// UpdateTargetDays sets the "target_days" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateTargetDays() *HabitUpsert {
+	u.SetExcluded(habit.FieldTargetDays)
+	return u
+}
+
+// SetIsActive sets the "is_active" field.
+func (u *HabitUpsert) SetIsActive(v bool) *HabitUpsert {
+	u.Set(habit.FieldIsActive, v)
+	return u
+}
+
+// UpdateIsActive sets the "is_active" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateIsActive() *HabitUpsert {
+	u.SetExcluded(habit.FieldIsActive)
+	return u
+}
+
+// SetCurrentPhase sets the "current_phase" field.
+func (u *HabitUpsert) SetCurrentPhase(v int) *HabitUpsert {
+	u.Set(habit.FieldCurrentPhase, v)
+	return u
+}
+
+// UpdateCurrentPhase sets the "current_phase" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateCurrentPhase() *HabitUpsert {
+	u.SetExcluded(habit.FieldCurrentPhase)
+	return u
+}
+
+// AddCurrentPhase adds v to the "current_phase" field.
+func (u *HabitUpsert) AddCurrentPhase(v int) *HabitUpsert {
+	u.Add(habit.FieldCurrentPhase, v)
+	return u
+}
+
+// SetHsi sets the "hsi" field.
+func (u *HabitUpsert) SetHsi(v float64) *HabitUpsert {
+	u.Set(habit.FieldHsi, v)
+	return u
+}
+
+// UpdateHsi sets the "hsi" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateHsi() *HabitUpsert {
+	u.SetExcluded(habit.FieldHsi)
+	return u
+}
+
+// AddHsi adds v to the "hsi" field.
+func (u *HabitUpsert) AddHsi(v float64) *HabitUpsert {
+	u.Add(habit.FieldHsi, v)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *HabitUpsert) SetCreatedAt(v time.Time) *HabitUpsert {
+	u.Set(habit.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateCreatedAt() *HabitUpsert {
+	u.SetExcluded(habit.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *HabitUpsert) SetUpdatedAt(v time.Time) *HabitUpsert {
+	u.Set(habit.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *HabitUpsert) UpdateUpdatedAt() *HabitUpsert {
+	u.SetExcluded(habit.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Habit.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(habit.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *HabitUpsertOne) UpdateNewValues() *HabitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(habit.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Habit.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *HabitUpsertOne) Ignore() *HabitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *HabitUpsertOne) DoNothing() *HabitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the HabitCreate.OnConflict
+// documentation for more info.
+func (u *HabitUpsertOne) Update(set func(*HabitUpsert)) *HabitUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&HabitUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *HabitUpsertOne) SetUserID(v uuid.UUID) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateUserID() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetTitle sets the "title" field.
+func (u *HabitUpsertOne) SetTitle(v string) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateTitle() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *HabitUpsertOne) SetCategory(v string) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateCategory() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateCategory()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *HabitUpsertOne) SetDescription(v string) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateDescription() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *HabitUpsertOne) ClearDescription() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetPriority sets the "priority" field.
+func (u *HabitUpsertOne) SetPriority(v int) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetPriority(v)
+	})
+}
+
+// AddPriority adds v to the "priority" field.
+func (u *HabitUpsertOne) AddPriority(v int) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.AddPriority(v)
+	})
+}
+
+// UpdatePriority sets the "priority" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdatePriority() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdatePriority()
+	})
+}
+
+// SetFrequencyType sets the "frequency_type" field.
+func (u *HabitUpsertOne) SetFrequencyType(v string) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetFrequencyType(v)
+	})
+}
+
+// UpdateFrequencyType sets the "frequency_type" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateFrequencyType() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateFrequencyType()
+	})
+}
+
+// SetTargetDays sets the "target_days" field.
+func (u *HabitUpsertOne) SetTargetDays(v []int) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetTargetDays(v)
+	})
+}
+
+// UpdateTargetDays sets the "target_days" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateTargetDays() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateTargetDays()
+	})
+}
+
+// SetIsActive sets the "is_active" field.
+func (u *HabitUpsertOne) SetIsActive(v bool) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetIsActive(v)
+	})
+}
+
+// UpdateIsActive sets the "is_active" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateIsActive() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateIsActive()
+	})
+}
+
+// SetCurrentPhase sets the "current_phase" field.
+func (u *HabitUpsertOne) SetCurrentPhase(v int) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetCurrentPhase(v)
+	})
+}
+
+// AddCurrentPhase adds v to the "current_phase" field.
+func (u *HabitUpsertOne) AddCurrentPhase(v int) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.AddCurrentPhase(v)
+	})
+}
+
+// UpdateCurrentPhase sets the "current_phase" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateCurrentPhase() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateCurrentPhase()
+	})
+}
+
+// SetHsi sets the "hsi" field.
+func (u *HabitUpsertOne) SetHsi(v float64) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetHsi(v)
+	})
+}
+
+// AddHsi adds v to the "hsi" field.
+func (u *HabitUpsertOne) AddHsi(v float64) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.AddHsi(v)
+	})
+}
+
+// UpdateHsi sets the "hsi" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateHsi() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateHsi()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *HabitUpsertOne) SetCreatedAt(v time.Time) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateCreatedAt() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *HabitUpsertOne) SetUpdatedAt(v time.Time) *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *HabitUpsertOne) UpdateUpdatedAt() *HabitUpsertOne {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *HabitUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for HabitCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *HabitUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *HabitUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: HabitUpsertOne.ID is not supported by MySQL driver. Use HabitUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *HabitUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // HabitCreateBulk is the builder for creating many Habit entities in bulk.
 type HabitCreateBulk struct {
 	config
 	err      error
 	builders []*HabitCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Habit entities in the database.
@@ -409,6 +913,7 @@ func (_c *HabitCreateBulk) Save(ctx context.Context) ([]*Habit, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -455,6 +960,316 @@ func (_c *HabitCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *HabitCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Habit.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.HabitUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *HabitCreateBulk) OnConflict(opts ...sql.ConflictOption) *HabitUpsertBulk {
+	_c.conflict = opts
+	return &HabitUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Habit.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *HabitCreateBulk) OnConflictColumns(columns ...string) *HabitUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &HabitUpsertBulk{
+		create: _c,
+	}
+}
+
+// HabitUpsertBulk is the builder for "upsert"-ing
+// a bulk of Habit nodes.
+type HabitUpsertBulk struct {
+	create *HabitCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Habit.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(habit.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *HabitUpsertBulk) UpdateNewValues() *HabitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(habit.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Habit.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *HabitUpsertBulk) Ignore() *HabitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *HabitUpsertBulk) DoNothing() *HabitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the HabitCreateBulk.OnConflict
+// documentation for more info.
+func (u *HabitUpsertBulk) Update(set func(*HabitUpsert)) *HabitUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&HabitUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *HabitUpsertBulk) SetUserID(v uuid.UUID) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateUserID() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetTitle sets the "title" field.
+func (u *HabitUpsertBulk) SetTitle(v string) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetTitle(v)
+	})
+}
+
+// UpdateTitle sets the "title" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateTitle() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateTitle()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *HabitUpsertBulk) SetCategory(v string) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateCategory() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateCategory()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *HabitUpsertBulk) SetDescription(v string) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateDescription() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *HabitUpsertBulk) ClearDescription() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetPriority sets the "priority" field.
+func (u *HabitUpsertBulk) SetPriority(v int) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetPriority(v)
+	})
+}
+
+// AddPriority adds v to the "priority" field.
+func (u *HabitUpsertBulk) AddPriority(v int) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.AddPriority(v)
+	})
+}
+
+// UpdatePriority sets the "priority" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdatePriority() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdatePriority()
+	})
+}
+
+// SetFrequencyType sets the "frequency_type" field.
+func (u *HabitUpsertBulk) SetFrequencyType(v string) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetFrequencyType(v)
+	})
+}
+
+// UpdateFrequencyType sets the "frequency_type" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateFrequencyType() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateFrequencyType()
+	})
+}
+
+// SetTargetDays sets the "target_days" field.
+func (u *HabitUpsertBulk) SetTargetDays(v []int) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetTargetDays(v)
+	})
+}
+
+// UpdateTargetDays sets the "target_days" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateTargetDays() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateTargetDays()
+	})
+}
+
+// SetIsActive sets the "is_active" field.
+func (u *HabitUpsertBulk) SetIsActive(v bool) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetIsActive(v)
+	})
+}
+
+// UpdateIsActive sets the "is_active" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateIsActive() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateIsActive()
+	})
+}
+
+// SetCurrentPhase sets the "current_phase" field.
+func (u *HabitUpsertBulk) SetCurrentPhase(v int) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetCurrentPhase(v)
+	})
+}
+
+// AddCurrentPhase adds v to the "current_phase" field.
+func (u *HabitUpsertBulk) AddCurrentPhase(v int) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.AddCurrentPhase(v)
+	})
+}
+
+// UpdateCurrentPhase sets the "current_phase" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateCurrentPhase() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateCurrentPhase()
+	})
+}
+
+// SetHsi sets the "hsi" field.
+func (u *HabitUpsertBulk) SetHsi(v float64) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetHsi(v)
+	})
+}
+
+// AddHsi adds v to the "hsi" field.
+func (u *HabitUpsertBulk) AddHsi(v float64) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.AddHsi(v)
+	})
+}
+
+// UpdateHsi sets the "hsi" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateHsi() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateHsi()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *HabitUpsertBulk) SetCreatedAt(v time.Time) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateCreatedAt() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *HabitUpsertBulk) SetUpdatedAt(v time.Time) *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *HabitUpsertBulk) UpdateUpdatedAt() *HabitUpsertBulk {
+	return u.Update(func(s *HabitUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *HabitUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the HabitCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for HabitCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *HabitUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

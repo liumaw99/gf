@@ -19,8 +19,9 @@ import (
 // MicroActionUpdate is the builder for updating MicroAction entities.
 type MicroActionUpdate struct {
 	config
-	hooks    []Hook
-	mutation *MicroActionMutation
+	hooks     []Hook
+	mutation  *MicroActionMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the MicroActionUpdate builder.
@@ -206,6 +207,12 @@ func (_u *MicroActionUpdate) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *MicroActionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *MicroActionUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *MicroActionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -251,6 +258,7 @@ func (_u *MicroActionUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(microaction.FieldCreatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{microaction.Label}
@@ -266,9 +274,10 @@ func (_u *MicroActionUpdate) sqlSave(ctx context.Context) (_node int, err error)
 // MicroActionUpdateOne is the builder for updating a single MicroAction entity.
 type MicroActionUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *MicroActionMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *MicroActionMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetHabitID sets the "habit_id" field.
@@ -461,6 +470,12 @@ func (_u *MicroActionUpdateOne) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *MicroActionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *MicroActionUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *MicroActionUpdateOne) sqlSave(ctx context.Context) (_node *MicroAction, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -523,6 +538,7 @@ func (_u *MicroActionUpdateOne) sqlSave(ctx context.Context) (_node *MicroAction
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(microaction.FieldCreatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &MicroAction{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

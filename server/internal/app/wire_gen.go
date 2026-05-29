@@ -39,7 +39,8 @@ func InitializeApp() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	authService := service.NewAuthService(configConfig, client)
+	manager := ProvideJWTManager(configConfig)
+	authService := service.NewAuthService(configConfig, client, manager, redisClient)
 	authHandler := handler.NewAuthHandler(authService)
 	deepSeekClient := ProvideDeepSeekClient(configConfig)
 	aiService := service.NewAIService(configConfig, client, deepSeekClient)
@@ -48,7 +49,7 @@ func InitializeApp() (*App, error) {
 	habitHandler := handler.NewHabitHandler(habitService)
 	characterService := service.NewCharacterService(configConfig, client)
 	characterHandler := handler.NewCharacterHandler(characterService)
-	app := New(configConfig, client, redisClient, authHandler, chatHandler, habitHandler, characterHandler)
+	app := New(configConfig, client, redisClient, manager, authHandler, chatHandler, habitHandler, characterHandler)
 	return app, nil
 }
 

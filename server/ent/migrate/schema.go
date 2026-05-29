@@ -241,6 +241,7 @@ var (
 		{Name: "apple_id", Type: field.TypeString, Unique: true, Nullable: true},
 		{Name: "google_id", Type: field.TypeString, Unique: true, Nullable: true},
 		{Name: "email", Type: field.TypeString, Nullable: true},
+		{Name: "password_hash", Type: field.TypeString, Nullable: true},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true},
 		{Name: "subscription_tier", Type: field.TypeString, Default: "free"},
@@ -263,6 +264,11 @@ var (
 				Name:    "user_google_id",
 				Unique:  true,
 				Columns: []*schema.Column{UsersColumns[2]},
+			},
+			{
+				Name:    "user_email",
+				Unique:  true,
+				Columns: []*schema.Column{UsersColumns[3]},
 			},
 		},
 	}

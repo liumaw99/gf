@@ -19,8 +19,9 @@ import (
 // DailyLogUpdate is the builder for updating DailyLog entities.
 type DailyLogUpdate struct {
 	config
-	hooks    []Hook
-	mutation *DailyLogMutation
+	hooks     []Hook
+	mutation  *DailyLogMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the DailyLogUpdate builder.
@@ -156,6 +157,12 @@ func (_u *DailyLogUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *DailyLogUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *DailyLogUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *DailyLogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(dailylog.Table, dailylog.Columns, sqlgraph.NewFieldSpec(dailylog.FieldID, field.TypeUUID))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
@@ -192,6 +199,7 @@ func (_u *DailyLogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.SummaryCleared() {
 		_spec.ClearField(dailylog.FieldSummary, field.TypeString)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{dailylog.Label}
@@ -207,9 +215,10 @@ func (_u *DailyLogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 // DailyLogUpdateOne is the builder for updating a single DailyLog entity.
 type DailyLogUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *DailyLogMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *DailyLogMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -352,6 +361,12 @@ func (_u *DailyLogUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *DailyLogUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *DailyLogUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *DailyLogUpdateOne) sqlSave(ctx context.Context) (_node *DailyLog, err error) {
 	_spec := sqlgraph.NewUpdateSpec(dailylog.Table, dailylog.Columns, sqlgraph.NewFieldSpec(dailylog.FieldID, field.TypeUUID))
 	id, ok := _u.mutation.ID()
@@ -405,6 +420,7 @@ func (_u *DailyLogUpdateOne) sqlSave(ctx context.Context) (_node *DailyLog, err 
 	if _u.mutation.SummaryCleared() {
 		_spec.ClearField(dailylog.FieldSummary, field.TypeString)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &DailyLog{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

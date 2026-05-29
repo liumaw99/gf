@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -19,6 +21,7 @@ type MicroActionCreate struct {
 	config
 	mutation *MicroActionMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetHabitID sets the "habit_id" field.
@@ -216,6 +219,7 @@ func (_c *MicroActionCreate) createSpec() (*MicroAction, *sqlgraph.CreateSpec) {
 		_node = &MicroAction{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(microaction.Table, sqlgraph.NewFieldSpec(microaction.FieldID, field.TypeUUID))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
@@ -251,11 +255,381 @@ func (_c *MicroActionCreate) createSpec() (*MicroAction, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MicroAction.Create().
+//		SetHabitID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MicroActionUpsert) {
+//			SetHabitID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *MicroActionCreate) OnConflict(opts ...sql.ConflictOption) *MicroActionUpsertOne {
+	_c.conflict = opts
+	return &MicroActionUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MicroAction.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *MicroActionCreate) OnConflictColumns(columns ...string) *MicroActionUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &MicroActionUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// MicroActionUpsertOne is the builder for "upsert"-ing
+	//  one MicroAction node.
+	MicroActionUpsertOne struct {
+		create *MicroActionCreate
+	}
+
+	// MicroActionUpsert is the "OnConflict" setter.
+	MicroActionUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetHabitID sets the "habit_id" field.
+func (u *MicroActionUpsert) SetHabitID(v uuid.UUID) *MicroActionUpsert {
+	u.Set(microaction.FieldHabitID, v)
+	return u
+}
+
+// UpdateHabitID sets the "habit_id" field to the value that was provided on create.
+func (u *MicroActionUpsert) UpdateHabitID() *MicroActionUpsert {
+	u.SetExcluded(microaction.FieldHabitID)
+	return u
+}
+
+// SetPhase sets the "phase" field.
+func (u *MicroActionUpsert) SetPhase(v int) *MicroActionUpsert {
+	u.Set(microaction.FieldPhase, v)
+	return u
+}
+
+// UpdatePhase sets the "phase" field to the value that was provided on create.
+func (u *MicroActionUpsert) UpdatePhase() *MicroActionUpsert {
+	u.SetExcluded(microaction.FieldPhase)
+	return u
+}
+
+// AddPhase adds v to the "phase" field.
+func (u *MicroActionUpsert) AddPhase(v int) *MicroActionUpsert {
+	u.Add(microaction.FieldPhase, v)
+	return u
+}
+
+// SetDayInPhase sets the "day_in_phase" field.
+func (u *MicroActionUpsert) SetDayInPhase(v int) *MicroActionUpsert {
+	u.Set(microaction.FieldDayInPhase, v)
+	return u
+}
+
+// UpdateDayInPhase sets the "day_in_phase" field to the value that was provided on create.
+func (u *MicroActionUpsert) UpdateDayInPhase() *MicroActionUpsert {
+	u.SetExcluded(microaction.FieldDayInPhase)
+	return u
+}
+
+// AddDayInPhase adds v to the "day_in_phase" field.
+func (u *MicroActionUpsert) AddDayInPhase(v int) *MicroActionUpsert {
+	u.Add(microaction.FieldDayInPhase, v)
+	return u
+}
+
+// SetActionText sets the "action_text" field.
+func (u *MicroActionUpsert) SetActionText(v string) *MicroActionUpsert {
+	u.Set(microaction.FieldActionText, v)
+	return u
+}
+
+// UpdateActionText sets the "action_text" field to the value that was provided on create.
+func (u *MicroActionUpsert) UpdateActionText() *MicroActionUpsert {
+	u.SetExcluded(microaction.FieldActionText)
+	return u
+}
+
+// SetEstimatedDuration sets the "estimated_duration" field.
+func (u *MicroActionUpsert) SetEstimatedDuration(v int) *MicroActionUpsert {
+	u.Set(microaction.FieldEstimatedDuration, v)
+	return u
+}
+
+// UpdateEstimatedDuration sets the "estimated_duration" field to the value that was provided on create.
+func (u *MicroActionUpsert) UpdateEstimatedDuration() *MicroActionUpsert {
+	u.SetExcluded(microaction.FieldEstimatedDuration)
+	return u
+}
+
+// AddEstimatedDuration adds v to the "estimated_duration" field.
+func (u *MicroActionUpsert) AddEstimatedDuration(v int) *MicroActionUpsert {
+	u.Add(microaction.FieldEstimatedDuration, v)
+	return u
+}
+
+// ClearEstimatedDuration clears the value of the "estimated_duration" field.
+func (u *MicroActionUpsert) ClearEstimatedDuration() *MicroActionUpsert {
+	u.SetNull(microaction.FieldEstimatedDuration)
+	return u
+}
+
+// SetIsDefault sets the "is_default" field.
+func (u *MicroActionUpsert) SetIsDefault(v bool) *MicroActionUpsert {
+	u.Set(microaction.FieldIsDefault, v)
+	return u
+}
+
+// UpdateIsDefault sets the "is_default" field to the value that was provided on create.
+func (u *MicroActionUpsert) UpdateIsDefault() *MicroActionUpsert {
+	u.SetExcluded(microaction.FieldIsDefault)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *MicroActionUpsert) SetCreatedAt(v time.Time) *MicroActionUpsert {
+	u.Set(microaction.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *MicroActionUpsert) UpdateCreatedAt() *MicroActionUpsert {
+	u.SetExcluded(microaction.FieldCreatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.MicroAction.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(microaction.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *MicroActionUpsertOne) UpdateNewValues() *MicroActionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(microaction.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.MicroAction.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *MicroActionUpsertOne) Ignore() *MicroActionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MicroActionUpsertOne) DoNothing() *MicroActionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MicroActionCreate.OnConflict
+// documentation for more info.
+func (u *MicroActionUpsertOne) Update(set func(*MicroActionUpsert)) *MicroActionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MicroActionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetHabitID sets the "habit_id" field.
+func (u *MicroActionUpsertOne) SetHabitID(v uuid.UUID) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetHabitID(v)
+	})
+}
+
+// UpdateHabitID sets the "habit_id" field to the value that was provided on create.
+func (u *MicroActionUpsertOne) UpdateHabitID() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateHabitID()
+	})
+}
+
+// SetPhase sets the "phase" field.
+func (u *MicroActionUpsertOne) SetPhase(v int) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetPhase(v)
+	})
+}
+
+// AddPhase adds v to the "phase" field.
+func (u *MicroActionUpsertOne) AddPhase(v int) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.AddPhase(v)
+	})
+}
+
+// UpdatePhase sets the "phase" field to the value that was provided on create.
+func (u *MicroActionUpsertOne) UpdatePhase() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdatePhase()
+	})
+}
+
+// SetDayInPhase sets the "day_in_phase" field.
+func (u *MicroActionUpsertOne) SetDayInPhase(v int) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetDayInPhase(v)
+	})
+}
+
+// AddDayInPhase adds v to the "day_in_phase" field.
+func (u *MicroActionUpsertOne) AddDayInPhase(v int) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.AddDayInPhase(v)
+	})
+}
+
+// UpdateDayInPhase sets the "day_in_phase" field to the value that was provided on create.
+func (u *MicroActionUpsertOne) UpdateDayInPhase() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateDayInPhase()
+	})
+}
+
+// SetActionText sets the "action_text" field.
+func (u *MicroActionUpsertOne) SetActionText(v string) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetActionText(v)
+	})
+}
+
+// UpdateActionText sets the "action_text" field to the value that was provided on create.
+func (u *MicroActionUpsertOne) UpdateActionText() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateActionText()
+	})
+}
+
+// SetEstimatedDuration sets the "estimated_duration" field.
+func (u *MicroActionUpsertOne) SetEstimatedDuration(v int) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetEstimatedDuration(v)
+	})
+}
+
+// AddEstimatedDuration adds v to the "estimated_duration" field.
+func (u *MicroActionUpsertOne) AddEstimatedDuration(v int) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.AddEstimatedDuration(v)
+	})
+}
+
+// UpdateEstimatedDuration sets the "estimated_duration" field to the value that was provided on create.
+func (u *MicroActionUpsertOne) UpdateEstimatedDuration() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateEstimatedDuration()
+	})
+}
+
+// ClearEstimatedDuration clears the value of the "estimated_duration" field.
+func (u *MicroActionUpsertOne) ClearEstimatedDuration() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.ClearEstimatedDuration()
+	})
+}
+
+// SetIsDefault sets the "is_default" field.
+func (u *MicroActionUpsertOne) SetIsDefault(v bool) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetIsDefault(v)
+	})
+}
+
+// UpdateIsDefault sets the "is_default" field to the value that was provided on create.
+func (u *MicroActionUpsertOne) UpdateIsDefault() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateIsDefault()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *MicroActionUpsertOne) SetCreatedAt(v time.Time) *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *MicroActionUpsertOne) UpdateCreatedAt() *MicroActionUpsertOne {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *MicroActionUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MicroActionCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MicroActionUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *MicroActionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: MicroActionUpsertOne.ID is not supported by MySQL driver. Use MicroActionUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *MicroActionUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // MicroActionCreateBulk is the builder for creating many MicroAction entities in bulk.
 type MicroActionCreateBulk struct {
 	config
 	err      error
 	builders []*MicroActionCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the MicroAction entities in the database.
@@ -285,6 +659,7 @@ func (_c *MicroActionCreateBulk) Save(ctx context.Context) ([]*MicroAction, erro
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -331,6 +706,246 @@ func (_c *MicroActionCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *MicroActionCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MicroAction.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MicroActionUpsert) {
+//			SetHabitID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *MicroActionCreateBulk) OnConflict(opts ...sql.ConflictOption) *MicroActionUpsertBulk {
+	_c.conflict = opts
+	return &MicroActionUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MicroAction.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *MicroActionCreateBulk) OnConflictColumns(columns ...string) *MicroActionUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &MicroActionUpsertBulk{
+		create: _c,
+	}
+}
+
+// MicroActionUpsertBulk is the builder for "upsert"-ing
+// a bulk of MicroAction nodes.
+type MicroActionUpsertBulk struct {
+	create *MicroActionCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.MicroAction.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(microaction.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *MicroActionUpsertBulk) UpdateNewValues() *MicroActionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(microaction.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.MicroAction.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *MicroActionUpsertBulk) Ignore() *MicroActionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MicroActionUpsertBulk) DoNothing() *MicroActionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MicroActionCreateBulk.OnConflict
+// documentation for more info.
+func (u *MicroActionUpsertBulk) Update(set func(*MicroActionUpsert)) *MicroActionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MicroActionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetHabitID sets the "habit_id" field.
+func (u *MicroActionUpsertBulk) SetHabitID(v uuid.UUID) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetHabitID(v)
+	})
+}
+
+// UpdateHabitID sets the "habit_id" field to the value that was provided on create.
+func (u *MicroActionUpsertBulk) UpdateHabitID() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateHabitID()
+	})
+}
+
+// SetPhase sets the "phase" field.
+func (u *MicroActionUpsertBulk) SetPhase(v int) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetPhase(v)
+	})
+}
+
+// AddPhase adds v to the "phase" field.
+func (u *MicroActionUpsertBulk) AddPhase(v int) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.AddPhase(v)
+	})
+}
+
+// UpdatePhase sets the "phase" field to the value that was provided on create.
+func (u *MicroActionUpsertBulk) UpdatePhase() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdatePhase()
+	})
+}
+
+// SetDayInPhase sets the "day_in_phase" field.
+func (u *MicroActionUpsertBulk) SetDayInPhase(v int) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetDayInPhase(v)
+	})
+}
+
+// AddDayInPhase adds v to the "day_in_phase" field.
+func (u *MicroActionUpsertBulk) AddDayInPhase(v int) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.AddDayInPhase(v)
+	})
+}
+
+// UpdateDayInPhase sets the "day_in_phase" field to the value that was provided on create.
+func (u *MicroActionUpsertBulk) UpdateDayInPhase() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateDayInPhase()
+	})
+}
+
+// SetActionText sets the "action_text" field.
+func (u *MicroActionUpsertBulk) SetActionText(v string) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetActionText(v)
+	})
+}
+
+// UpdateActionText sets the "action_text" field to the value that was provided on create.
+func (u *MicroActionUpsertBulk) UpdateActionText() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateActionText()
+	})
+}
+
+// SetEstimatedDuration sets the "estimated_duration" field.
+func (u *MicroActionUpsertBulk) SetEstimatedDuration(v int) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetEstimatedDuration(v)
+	})
+}
+
+// AddEstimatedDuration adds v to the "estimated_duration" field.
+func (u *MicroActionUpsertBulk) AddEstimatedDuration(v int) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.AddEstimatedDuration(v)
+	})
+}
+
+// UpdateEstimatedDuration sets the "estimated_duration" field to the value that was provided on create.
+func (u *MicroActionUpsertBulk) UpdateEstimatedDuration() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateEstimatedDuration()
+	})
+}
+
+// ClearEstimatedDuration clears the value of the "estimated_duration" field.
+func (u *MicroActionUpsertBulk) ClearEstimatedDuration() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.ClearEstimatedDuration()
+	})
+}
+
+// SetIsDefault sets the "is_default" field.
+func (u *MicroActionUpsertBulk) SetIsDefault(v bool) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetIsDefault(v)
+	})
+}
+
+// UpdateIsDefault sets the "is_default" field to the value that was provided on create.
+func (u *MicroActionUpsertBulk) UpdateIsDefault() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateIsDefault()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *MicroActionUpsertBulk) SetCreatedAt(v time.Time) *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *MicroActionUpsertBulk) UpdateCreatedAt() *MicroActionUpsertBulk {
+	return u.Update(func(s *MicroActionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *MicroActionUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MicroActionCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MicroActionCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MicroActionUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

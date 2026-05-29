@@ -19,8 +19,9 @@ import (
 // ChatMessageUpdate is the builder for updating ChatMessage entities.
 type ChatMessageUpdate struct {
 	config
-	hooks    []Hook
-	mutation *ChatMessageMutation
+	hooks     []Hook
+	mutation  *ChatMessageMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the ChatMessageUpdate builder.
@@ -166,6 +167,12 @@ func (_u *ChatMessageUpdate) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *ChatMessageUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ChatMessageUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *ChatMessageUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -199,6 +206,7 @@ func (_u *ChatMessageUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(chatmessage.FieldCreatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{chatmessage.Label}
@@ -214,9 +222,10 @@ func (_u *ChatMessageUpdate) sqlSave(ctx context.Context) (_node int, err error)
 // ChatMessageUpdateOne is the builder for updating a single ChatMessage entity.
 type ChatMessageUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *ChatMessageMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *ChatMessageMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -369,6 +378,12 @@ func (_u *ChatMessageUpdateOne) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *ChatMessageUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ChatMessageUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *ChatMessageUpdateOne) sqlSave(ctx context.Context) (_node *ChatMessage, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -419,6 +434,7 @@ func (_u *ChatMessageUpdateOne) sqlSave(ctx context.Context) (_node *ChatMessage
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(chatmessage.FieldCreatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &ChatMessage{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

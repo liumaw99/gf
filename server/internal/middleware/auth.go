@@ -4,11 +4,12 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/pkg/jwt"
 	"github.com/lagom/lagom-server/internal/pkg/response"
 )
 
 // JWTAuth JWT 认证中间件
-func JWTAuth(secret string) gin.HandlerFunc {
+func JWTAuth(mgr *jwt.Manager) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -26,12 +27,14 @@ func JWTAuth(secret string) gin.HandlerFunc {
 
 		token := parts[1]
 
-		// TODO: 验证 JWT
-		_ = token
-		_ = secret
+		claims, err := mgr.Validate(token)
+		if err != nil {
+			response.Unauthorized(c, "invalid or expired token")
+			c.Abort()
+			return
+		}
 
-		// 临时跳过验证，开发阶段
-		c.Set("user_id", "dev-user-id")
+		c.Set("user_id", claims.UserID)
 		c.Next()
 	}
 }

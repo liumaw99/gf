@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/lagom/lagom-server/ent/celebritycharacter"
@@ -18,6 +20,7 @@ type CelebrityCharacterCreate struct {
 	config
 	mutation *CelebrityCharacterMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetName sets the "name" field.
@@ -343,6 +346,7 @@ func (_c *CelebrityCharacterCreate) createSpec() (*CelebrityCharacter, *sqlgraph
 		_node = &CelebrityCharacter{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(celebritycharacter.Table, sqlgraph.NewFieldSpec(celebritycharacter.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -410,11 +414,615 @@ func (_c *CelebrityCharacterCreate) createSpec() (*CelebrityCharacter, *sqlgraph
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.CelebrityCharacter.Create().
+//		SetName(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CelebrityCharacterUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *CelebrityCharacterCreate) OnConflict(opts ...sql.ConflictOption) *CelebrityCharacterUpsertOne {
+	_c.conflict = opts
+	return &CelebrityCharacterUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.CelebrityCharacter.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *CelebrityCharacterCreate) OnConflictColumns(columns ...string) *CelebrityCharacterUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &CelebrityCharacterUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// CelebrityCharacterUpsertOne is the builder for "upsert"-ing
+	//  one CelebrityCharacter node.
+	CelebrityCharacterUpsertOne struct {
+		create *CelebrityCharacterCreate
+	}
+
+	// CelebrityCharacterUpsert is the "OnConflict" setter.
+	CelebrityCharacterUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetName sets the "name" field.
+func (u *CelebrityCharacterUpsert) SetName(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateName() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldName)
+	return u
+}
+
+// SetNameEn sets the "name_en" field.
+func (u *CelebrityCharacterUpsert) SetNameEn(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldNameEn, v)
+	return u
+}
+
+// UpdateNameEn sets the "name_en" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateNameEn() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldNameEn)
+	return u
+}
+
+// ClearNameEn clears the value of the "name_en" field.
+func (u *CelebrityCharacterUpsert) ClearNameEn() *CelebrityCharacterUpsert {
+	u.SetNull(celebritycharacter.FieldNameEn)
+	return u
+}
+
+// SetCategory sets the "category" field.
+func (u *CelebrityCharacterUpsert) SetCategory(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldCategory, v)
+	return u
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateCategory() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldCategory)
+	return u
+}
+
+// SetEra sets the "era" field.
+func (u *CelebrityCharacterUpsert) SetEra(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldEra, v)
+	return u
+}
+
+// UpdateEra sets the "era" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateEra() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldEra)
+	return u
+}
+
+// ClearEra clears the value of the "era" field.
+func (u *CelebrityCharacterUpsert) ClearEra() *CelebrityCharacterUpsert {
+	u.SetNull(celebritycharacter.FieldEra)
+	return u
+}
+
+// SetNationality sets the "nationality" field.
+func (u *CelebrityCharacterUpsert) SetNationality(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldNationality, v)
+	return u
+}
+
+// UpdateNationality sets the "nationality" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateNationality() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldNationality)
+	return u
+}
+
+// ClearNationality clears the value of the "nationality" field.
+func (u *CelebrityCharacterUpsert) ClearNationality() *CelebrityCharacterUpsert {
+	u.SetNull(celebritycharacter.FieldNationality)
+	return u
+}
+
+// SetFamousFor sets the "famous_for" field.
+func (u *CelebrityCharacterUpsert) SetFamousFor(v []string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldFamousFor, v)
+	return u
+}
+
+// UpdateFamousFor sets the "famous_for" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateFamousFor() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldFamousFor)
+	return u
+}
+
+// SetAvatarURL sets the "avatar_url" field.
+func (u *CelebrityCharacterUpsert) SetAvatarURL(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldAvatarURL, v)
+	return u
+}
+
+// UpdateAvatarURL sets the "avatar_url" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateAvatarURL() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldAvatarURL)
+	return u
+}
+
+// ClearAvatarURL clears the value of the "avatar_url" field.
+func (u *CelebrityCharacterUpsert) ClearAvatarURL() *CelebrityCharacterUpsert {
+	u.SetNull(celebritycharacter.FieldAvatarURL)
+	return u
+}
+
+// SetAvatarLottieURL sets the "avatar_lottie_url" field.
+func (u *CelebrityCharacterUpsert) SetAvatarLottieURL(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldAvatarLottieURL, v)
+	return u
+}
+
+// UpdateAvatarLottieURL sets the "avatar_lottie_url" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateAvatarLottieURL() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldAvatarLottieURL)
+	return u
+}
+
+// ClearAvatarLottieURL clears the value of the "avatar_lottie_url" field.
+func (u *CelebrityCharacterUpsert) ClearAvatarLottieURL() *CelebrityCharacterUpsert {
+	u.SetNull(celebritycharacter.FieldAvatarLottieURL)
+	return u
+}
+
+// SetStyleTags sets the "style_tags" field.
+func (u *CelebrityCharacterUpsert) SetStyleTags(v []string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldStyleTags, v)
+	return u
+}
+
+// UpdateStyleTags sets the "style_tags" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateStyleTags() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldStyleTags)
+	return u
+}
+
+// SetDistillate sets the "distillate" field.
+func (u *CelebrityCharacterUpsert) SetDistillate(v map[string]interface{}) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldDistillate, v)
+	return u
+}
+
+// UpdateDistillate sets the "distillate" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateDistillate() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldDistillate)
+	return u
+}
+
+// SetQualityScore sets the "quality_score" field.
+func (u *CelebrityCharacterUpsert) SetQualityScore(v float64) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldQualityScore, v)
+	return u
+}
+
+// UpdateQualityScore sets the "quality_score" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateQualityScore() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldQualityScore)
+	return u
+}
+
+// AddQualityScore adds v to the "quality_score" field.
+func (u *CelebrityCharacterUpsert) AddQualityScore(v float64) *CelebrityCharacterUpsert {
+	u.Add(celebritycharacter.FieldQualityScore, v)
+	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *CelebrityCharacterUpsert) SetStatus(v string) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateStatus() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldStatus)
+	return u
+}
+
+// SetIsPremium sets the "is_premium" field.
+func (u *CelebrityCharacterUpsert) SetIsPremium(v bool) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldIsPremium, v)
+	return u
+}
+
+// UpdateIsPremium sets the "is_premium" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateIsPremium() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldIsPremium)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CelebrityCharacterUpsert) SetCreatedAt(v time.Time) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateCreatedAt() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CelebrityCharacterUpsert) SetUpdatedAt(v time.Time) *CelebrityCharacterUpsert {
+	u.Set(celebritycharacter.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsert) UpdateUpdatedAt() *CelebrityCharacterUpsert {
+	u.SetExcluded(celebritycharacter.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.CelebrityCharacter.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(celebritycharacter.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *CelebrityCharacterUpsertOne) UpdateNewValues() *CelebrityCharacterUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(celebritycharacter.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.CelebrityCharacter.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *CelebrityCharacterUpsertOne) Ignore() *CelebrityCharacterUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *CelebrityCharacterUpsertOne) DoNothing() *CelebrityCharacterUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the CelebrityCharacterCreate.OnConflict
+// documentation for more info.
+func (u *CelebrityCharacterUpsertOne) Update(set func(*CelebrityCharacterUpsert)) *CelebrityCharacterUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&CelebrityCharacterUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *CelebrityCharacterUpsertOne) SetName(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateName() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetNameEn sets the "name_en" field.
+func (u *CelebrityCharacterUpsertOne) SetNameEn(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetNameEn(v)
+	})
+}
+
+// UpdateNameEn sets the "name_en" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateNameEn() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateNameEn()
+	})
+}
+
+// ClearNameEn clears the value of the "name_en" field.
+func (u *CelebrityCharacterUpsertOne) ClearNameEn() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearNameEn()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *CelebrityCharacterUpsertOne) SetCategory(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateCategory() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateCategory()
+	})
+}
+
+// SetEra sets the "era" field.
+func (u *CelebrityCharacterUpsertOne) SetEra(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetEra(v)
+	})
+}
+
+// UpdateEra sets the "era" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateEra() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateEra()
+	})
+}
+
+// ClearEra clears the value of the "era" field.
+func (u *CelebrityCharacterUpsertOne) ClearEra() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearEra()
+	})
+}
+
+// SetNationality sets the "nationality" field.
+func (u *CelebrityCharacterUpsertOne) SetNationality(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetNationality(v)
+	})
+}
+
+// UpdateNationality sets the "nationality" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateNationality() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateNationality()
+	})
+}
+
+// ClearNationality clears the value of the "nationality" field.
+func (u *CelebrityCharacterUpsertOne) ClearNationality() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearNationality()
+	})
+}
+
+// SetFamousFor sets the "famous_for" field.
+func (u *CelebrityCharacterUpsertOne) SetFamousFor(v []string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetFamousFor(v)
+	})
+}
+
+// UpdateFamousFor sets the "famous_for" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateFamousFor() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateFamousFor()
+	})
+}
+
+// SetAvatarURL sets the "avatar_url" field.
+func (u *CelebrityCharacterUpsertOne) SetAvatarURL(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetAvatarURL(v)
+	})
+}
+
+// UpdateAvatarURL sets the "avatar_url" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateAvatarURL() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateAvatarURL()
+	})
+}
+
+// ClearAvatarURL clears the value of the "avatar_url" field.
+func (u *CelebrityCharacterUpsertOne) ClearAvatarURL() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearAvatarURL()
+	})
+}
+
+// SetAvatarLottieURL sets the "avatar_lottie_url" field.
+func (u *CelebrityCharacterUpsertOne) SetAvatarLottieURL(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetAvatarLottieURL(v)
+	})
+}
+
+// UpdateAvatarLottieURL sets the "avatar_lottie_url" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateAvatarLottieURL() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateAvatarLottieURL()
+	})
+}
+
+// ClearAvatarLottieURL clears the value of the "avatar_lottie_url" field.
+func (u *CelebrityCharacterUpsertOne) ClearAvatarLottieURL() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearAvatarLottieURL()
+	})
+}
+
+// SetStyleTags sets the "style_tags" field.
+func (u *CelebrityCharacterUpsertOne) SetStyleTags(v []string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetStyleTags(v)
+	})
+}
+
+// UpdateStyleTags sets the "style_tags" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateStyleTags() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateStyleTags()
+	})
+}
+
+// SetDistillate sets the "distillate" field.
+func (u *CelebrityCharacterUpsertOne) SetDistillate(v map[string]interface{}) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetDistillate(v)
+	})
+}
+
+// UpdateDistillate sets the "distillate" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateDistillate() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateDistillate()
+	})
+}
+
+// SetQualityScore sets the "quality_score" field.
+func (u *CelebrityCharacterUpsertOne) SetQualityScore(v float64) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetQualityScore(v)
+	})
+}
+
+// AddQualityScore adds v to the "quality_score" field.
+func (u *CelebrityCharacterUpsertOne) AddQualityScore(v float64) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.AddQualityScore(v)
+	})
+}
+
+// UpdateQualityScore sets the "quality_score" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateQualityScore() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateQualityScore()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *CelebrityCharacterUpsertOne) SetStatus(v string) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateStatus() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetIsPremium sets the "is_premium" field.
+func (u *CelebrityCharacterUpsertOne) SetIsPremium(v bool) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetIsPremium(v)
+	})
+}
+
+// UpdateIsPremium sets the "is_premium" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateIsPremium() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateIsPremium()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CelebrityCharacterUpsertOne) SetCreatedAt(v time.Time) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateCreatedAt() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CelebrityCharacterUpsertOne) SetUpdatedAt(v time.Time) *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertOne) UpdateUpdatedAt() *CelebrityCharacterUpsertOne {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *CelebrityCharacterUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for CelebrityCharacterCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *CelebrityCharacterUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *CelebrityCharacterUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: CelebrityCharacterUpsertOne.ID is not supported by MySQL driver. Use CelebrityCharacterUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *CelebrityCharacterUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // CelebrityCharacterCreateBulk is the builder for creating many CelebrityCharacter entities in bulk.
 type CelebrityCharacterCreateBulk struct {
 	config
 	err      error
 	builders []*CelebrityCharacterCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the CelebrityCharacter entities in the database.
@@ -444,6 +1052,7 @@ func (_c *CelebrityCharacterCreateBulk) Save(ctx context.Context) ([]*CelebrityC
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -490,6 +1099,372 @@ func (_c *CelebrityCharacterCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *CelebrityCharacterCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.CelebrityCharacter.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CelebrityCharacterUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *CelebrityCharacterCreateBulk) OnConflict(opts ...sql.ConflictOption) *CelebrityCharacterUpsertBulk {
+	_c.conflict = opts
+	return &CelebrityCharacterUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.CelebrityCharacter.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *CelebrityCharacterCreateBulk) OnConflictColumns(columns ...string) *CelebrityCharacterUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &CelebrityCharacterUpsertBulk{
+		create: _c,
+	}
+}
+
+// CelebrityCharacterUpsertBulk is the builder for "upsert"-ing
+// a bulk of CelebrityCharacter nodes.
+type CelebrityCharacterUpsertBulk struct {
+	create *CelebrityCharacterCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.CelebrityCharacter.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(celebritycharacter.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *CelebrityCharacterUpsertBulk) UpdateNewValues() *CelebrityCharacterUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(celebritycharacter.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.CelebrityCharacter.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *CelebrityCharacterUpsertBulk) Ignore() *CelebrityCharacterUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *CelebrityCharacterUpsertBulk) DoNothing() *CelebrityCharacterUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the CelebrityCharacterCreateBulk.OnConflict
+// documentation for more info.
+func (u *CelebrityCharacterUpsertBulk) Update(set func(*CelebrityCharacterUpsert)) *CelebrityCharacterUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&CelebrityCharacterUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *CelebrityCharacterUpsertBulk) SetName(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateName() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetNameEn sets the "name_en" field.
+func (u *CelebrityCharacterUpsertBulk) SetNameEn(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetNameEn(v)
+	})
+}
+
+// UpdateNameEn sets the "name_en" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateNameEn() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateNameEn()
+	})
+}
+
+// ClearNameEn clears the value of the "name_en" field.
+func (u *CelebrityCharacterUpsertBulk) ClearNameEn() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearNameEn()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *CelebrityCharacterUpsertBulk) SetCategory(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateCategory() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateCategory()
+	})
+}
+
+// SetEra sets the "era" field.
+func (u *CelebrityCharacterUpsertBulk) SetEra(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetEra(v)
+	})
+}
+
+// UpdateEra sets the "era" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateEra() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateEra()
+	})
+}
+
+// ClearEra clears the value of the "era" field.
+func (u *CelebrityCharacterUpsertBulk) ClearEra() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearEra()
+	})
+}
+
+// SetNationality sets the "nationality" field.
+func (u *CelebrityCharacterUpsertBulk) SetNationality(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetNationality(v)
+	})
+}
+
+// UpdateNationality sets the "nationality" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateNationality() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateNationality()
+	})
+}
+
+// ClearNationality clears the value of the "nationality" field.
+func (u *CelebrityCharacterUpsertBulk) ClearNationality() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearNationality()
+	})
+}
+
+// SetFamousFor sets the "famous_for" field.
+func (u *CelebrityCharacterUpsertBulk) SetFamousFor(v []string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetFamousFor(v)
+	})
+}
+
+// UpdateFamousFor sets the "famous_for" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateFamousFor() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateFamousFor()
+	})
+}
+
+// SetAvatarURL sets the "avatar_url" field.
+func (u *CelebrityCharacterUpsertBulk) SetAvatarURL(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetAvatarURL(v)
+	})
+}
+
+// UpdateAvatarURL sets the "avatar_url" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateAvatarURL() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateAvatarURL()
+	})
+}
+
+// ClearAvatarURL clears the value of the "avatar_url" field.
+func (u *CelebrityCharacterUpsertBulk) ClearAvatarURL() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearAvatarURL()
+	})
+}
+
+// SetAvatarLottieURL sets the "avatar_lottie_url" field.
+func (u *CelebrityCharacterUpsertBulk) SetAvatarLottieURL(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetAvatarLottieURL(v)
+	})
+}
+
+// UpdateAvatarLottieURL sets the "avatar_lottie_url" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateAvatarLottieURL() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateAvatarLottieURL()
+	})
+}
+
+// ClearAvatarLottieURL clears the value of the "avatar_lottie_url" field.
+func (u *CelebrityCharacterUpsertBulk) ClearAvatarLottieURL() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.ClearAvatarLottieURL()
+	})
+}
+
+// SetStyleTags sets the "style_tags" field.
+func (u *CelebrityCharacterUpsertBulk) SetStyleTags(v []string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetStyleTags(v)
+	})
+}
+
+// UpdateStyleTags sets the "style_tags" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateStyleTags() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateStyleTags()
+	})
+}
+
+// SetDistillate sets the "distillate" field.
+func (u *CelebrityCharacterUpsertBulk) SetDistillate(v map[string]interface{}) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetDistillate(v)
+	})
+}
+
+// UpdateDistillate sets the "distillate" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateDistillate() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateDistillate()
+	})
+}
+
+// SetQualityScore sets the "quality_score" field.
+func (u *CelebrityCharacterUpsertBulk) SetQualityScore(v float64) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetQualityScore(v)
+	})
+}
+
+// AddQualityScore adds v to the "quality_score" field.
+func (u *CelebrityCharacterUpsertBulk) AddQualityScore(v float64) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.AddQualityScore(v)
+	})
+}
+
+// UpdateQualityScore sets the "quality_score" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateQualityScore() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateQualityScore()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *CelebrityCharacterUpsertBulk) SetStatus(v string) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateStatus() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetIsPremium sets the "is_premium" field.
+func (u *CelebrityCharacterUpsertBulk) SetIsPremium(v bool) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetIsPremium(v)
+	})
+}
+
+// UpdateIsPremium sets the "is_premium" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateIsPremium() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateIsPremium()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CelebrityCharacterUpsertBulk) SetCreatedAt(v time.Time) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateCreatedAt() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CelebrityCharacterUpsertBulk) SetUpdatedAt(v time.Time) *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CelebrityCharacterUpsertBulk) UpdateUpdatedAt() *CelebrityCharacterUpsertBulk {
+	return u.Update(func(s *CelebrityCharacterUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *CelebrityCharacterUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the CelebrityCharacterCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for CelebrityCharacterCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *CelebrityCharacterUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

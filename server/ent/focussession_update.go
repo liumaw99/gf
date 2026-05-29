@@ -20,8 +20,9 @@ import (
 // FocusSessionUpdate is the builder for updating FocusSession entities.
 type FocusSessionUpdate struct {
 	config
-	hooks    []Hook
-	mutation *FocusSessionMutation
+	hooks     []Hook
+	mutation  *FocusSessionMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the FocusSessionUpdate builder.
@@ -194,6 +195,12 @@ func (_u *FocusSessionUpdate) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *FocusSessionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *FocusSessionUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *FocusSessionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -244,6 +251,7 @@ func (_u *FocusSessionUpdate) sqlSave(ctx context.Context) (_node int, err error
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(focussession.FieldCreatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{focussession.Label}
@@ -259,9 +267,10 @@ func (_u *FocusSessionUpdate) sqlSave(ctx context.Context) (_node int, err error
 // FocusSessionUpdateOne is the builder for updating a single FocusSession entity.
 type FocusSessionUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *FocusSessionMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *FocusSessionMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -441,6 +450,12 @@ func (_u *FocusSessionUpdateOne) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *FocusSessionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *FocusSessionUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *FocusSessionUpdateOne) sqlSave(ctx context.Context) (_node *FocusSession, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -508,6 +523,7 @@ func (_u *FocusSessionUpdateOne) sqlSave(ctx context.Context) (_node *FocusSessi
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(focussession.FieldCreatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &FocusSession{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

@@ -10,6 +10,7 @@ import (
 	"github.com/lagom/lagom-server/ent"
 	"github.com/lagom/lagom-server/internal/handler"
 	"github.com/lagom/lagom-server/internal/middleware"
+	"github.com/lagom/lagom-server/internal/pkg/jwt"
 	"github.com/lagom/lagom-server/internal/pkg/redis"
 	"github.com/lagom/lagom-server/internal/pkg/response"
 )
@@ -20,6 +21,7 @@ func setupRouter(
 	cfg *config.Config,
 	client *ent.Client,
 	rdb *redis.Client,
+	jwtMgr *jwt.Manager,
 	authHandler *handler.AuthHandler,
 	chatHandler *handler.ChatHandler,
 	habitHandler *handler.HabitHandler,
@@ -58,6 +60,8 @@ func setupRouter(
 
 		auth := api.Group("/auth")
 		{
+			auth.POST("/register", authHandler.Register)
+			auth.POST("/login", authHandler.Login)
 			auth.POST("/apple", authHandler.AppleSignIn)
 			auth.POST("/google", authHandler.GoogleSignIn)
 			auth.POST("/refresh", authHandler.RefreshToken)
@@ -65,7 +69,7 @@ func setupRouter(
 
 		// 需要认证的路由
 		authorized := api.Group("")
-		authorized.Use(middleware.JWTAuth(cfg.JWT.Secret))
+		authorized.Use(middleware.JWTAuth(jwtMgr))
 		{
 			authorized.POST("/chat", chatHandler.Chat)
 			authorized.GET("/chat/history", chatHandler.GetHistory)

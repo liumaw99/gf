@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -19,6 +21,7 @@ type UserCharacterConfigCreate struct {
 	config
 	mutation *UserCharacterConfigMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetUserID sets the "user_id" field.
@@ -410,6 +413,7 @@ func (_c *UserCharacterConfigCreate) createSpec() (*UserCharacterConfig, *sqlgra
 		_node = &UserCharacterConfig{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(usercharacterconfig.Table, sqlgraph.NewFieldSpec(usercharacterconfig.FieldID, field.TypeUUID))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
@@ -485,11 +489,693 @@ func (_c *UserCharacterConfigCreate) createSpec() (*UserCharacterConfig, *sqlgra
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.UserCharacterConfig.Create().
+//		SetUserID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.UserCharacterConfigUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *UserCharacterConfigCreate) OnConflict(opts ...sql.ConflictOption) *UserCharacterConfigUpsertOne {
+	_c.conflict = opts
+	return &UserCharacterConfigUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.UserCharacterConfig.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *UserCharacterConfigCreate) OnConflictColumns(columns ...string) *UserCharacterConfigUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &UserCharacterConfigUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// UserCharacterConfigUpsertOne is the builder for "upsert"-ing
+	//  one UserCharacterConfig node.
+	UserCharacterConfigUpsertOne struct {
+		create *UserCharacterConfigCreate
+	}
+
+	// UserCharacterConfigUpsert is the "OnConflict" setter.
+	UserCharacterConfigUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUserID sets the "user_id" field.
+func (u *UserCharacterConfigUpsert) SetUserID(v uuid.UUID) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateUserID() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldUserID)
+	return u
+}
+
+// SetCharacterID sets the "character_id" field.
+func (u *UserCharacterConfigUpsert) SetCharacterID(v string) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldCharacterID, v)
+	return u
+}
+
+// UpdateCharacterID sets the "character_id" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateCharacterID() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldCharacterID)
+	return u
+}
+
+// SetCustomName sets the "custom_name" field.
+func (u *UserCharacterConfigUpsert) SetCustomName(v string) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldCustomName, v)
+	return u
+}
+
+// UpdateCustomName sets the "custom_name" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateCustomName() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldCustomName)
+	return u
+}
+
+// ClearCustomName clears the value of the "custom_name" field.
+func (u *UserCharacterConfigUpsert) ClearCustomName() *UserCharacterConfigUpsert {
+	u.SetNull(usercharacterconfig.FieldCustomName)
+	return u
+}
+
+// SetCustomAvatarURL sets the "custom_avatar_url" field.
+func (u *UserCharacterConfigUpsert) SetCustomAvatarURL(v string) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldCustomAvatarURL, v)
+	return u
+}
+
+// UpdateCustomAvatarURL sets the "custom_avatar_url" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateCustomAvatarURL() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldCustomAvatarURL)
+	return u
+}
+
+// ClearCustomAvatarURL clears the value of the "custom_avatar_url" field.
+func (u *UserCharacterConfigUpsert) ClearCustomAvatarURL() *UserCharacterConfigUpsert {
+	u.SetNull(usercharacterconfig.FieldCustomAvatarURL)
+	return u
+}
+
+// SetIntimacyLevel sets the "intimacy_level" field.
+func (u *UserCharacterConfigUpsert) SetIntimacyLevel(v int) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldIntimacyLevel, v)
+	return u
+}
+
+// UpdateIntimacyLevel sets the "intimacy_level" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateIntimacyLevel() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldIntimacyLevel)
+	return u
+}
+
+// AddIntimacyLevel adds v to the "intimacy_level" field.
+func (u *UserCharacterConfigUpsert) AddIntimacyLevel(v int) *UserCharacterConfigUpsert {
+	u.Add(usercharacterconfig.FieldIntimacyLevel, v)
+	return u
+}
+
+// SetIntimacyScore sets the "intimacy_score" field.
+func (u *UserCharacterConfigUpsert) SetIntimacyScore(v int) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldIntimacyScore, v)
+	return u
+}
+
+// UpdateIntimacyScore sets the "intimacy_score" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateIntimacyScore() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldIntimacyScore)
+	return u
+}
+
+// AddIntimacyScore adds v to the "intimacy_score" field.
+func (u *UserCharacterConfigUpsert) AddIntimacyScore(v int) *UserCharacterConfigUpsert {
+	u.Add(usercharacterconfig.FieldIntimacyScore, v)
+	return u
+}
+
+// SetUnlockedStories sets the "unlocked_stories" field.
+func (u *UserCharacterConfigUpsert) SetUnlockedStories(v []string) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldUnlockedStories, v)
+	return u
+}
+
+// UpdateUnlockedStories sets the "unlocked_stories" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateUnlockedStories() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldUnlockedStories)
+	return u
+}
+
+// SetUnlockedExpressions sets the "unlocked_expressions" field.
+func (u *UserCharacterConfigUpsert) SetUnlockedExpressions(v []string) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldUnlockedExpressions, v)
+	return u
+}
+
+// UpdateUnlockedExpressions sets the "unlocked_expressions" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateUnlockedExpressions() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldUnlockedExpressions)
+	return u
+}
+
+// SetUnlockedDeepNightMode sets the "unlocked_deep_night_mode" field.
+func (u *UserCharacterConfigUpsert) SetUnlockedDeepNightMode(v bool) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldUnlockedDeepNightMode, v)
+	return u
+}
+
+// UpdateUnlockedDeepNightMode sets the "unlocked_deep_night_mode" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateUnlockedDeepNightMode() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldUnlockedDeepNightMode)
+	return u
+}
+
+// SetTotalMessages sets the "total_messages" field.
+func (u *UserCharacterConfigUpsert) SetTotalMessages(v int) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldTotalMessages, v)
+	return u
+}
+
+// UpdateTotalMessages sets the "total_messages" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateTotalMessages() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldTotalMessages)
+	return u
+}
+
+// AddTotalMessages adds v to the "total_messages" field.
+func (u *UserCharacterConfigUpsert) AddTotalMessages(v int) *UserCharacterConfigUpsert {
+	u.Add(usercharacterconfig.FieldTotalMessages, v)
+	return u
+}
+
+// SetTotalGoalsCompleted sets the "total_goals_completed" field.
+func (u *UserCharacterConfigUpsert) SetTotalGoalsCompleted(v int) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldTotalGoalsCompleted, v)
+	return u
+}
+
+// UpdateTotalGoalsCompleted sets the "total_goals_completed" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateTotalGoalsCompleted() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldTotalGoalsCompleted)
+	return u
+}
+
+// AddTotalGoalsCompleted adds v to the "total_goals_completed" field.
+func (u *UserCharacterConfigUpsert) AddTotalGoalsCompleted(v int) *UserCharacterConfigUpsert {
+	u.Add(usercharacterconfig.FieldTotalGoalsCompleted, v)
+	return u
+}
+
+// SetIsActive sets the "is_active" field.
+func (u *UserCharacterConfigUpsert) SetIsActive(v bool) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldIsActive, v)
+	return u
+}
+
+// UpdateIsActive sets the "is_active" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateIsActive() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldIsActive)
+	return u
+}
+
+// SetIsFavorite sets the "is_favorite" field.
+func (u *UserCharacterConfigUpsert) SetIsFavorite(v bool) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldIsFavorite, v)
+	return u
+}
+
+// UpdateIsFavorite sets the "is_favorite" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateIsFavorite() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldIsFavorite)
+	return u
+}
+
+// SetSwitchCountThisMonth sets the "switch_count_this_month" field.
+func (u *UserCharacterConfigUpsert) SetSwitchCountThisMonth(v int) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldSwitchCountThisMonth, v)
+	return u
+}
+
+// UpdateSwitchCountThisMonth sets the "switch_count_this_month" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateSwitchCountThisMonth() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldSwitchCountThisMonth)
+	return u
+}
+
+// AddSwitchCountThisMonth adds v to the "switch_count_this_month" field.
+func (u *UserCharacterConfigUpsert) AddSwitchCountThisMonth(v int) *UserCharacterConfigUpsert {
+	u.Add(usercharacterconfig.FieldSwitchCountThisMonth, v)
+	return u
+}
+
+// SetLastSwitchDate sets the "last_switch_date" field.
+func (u *UserCharacterConfigUpsert) SetLastSwitchDate(v time.Time) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldLastSwitchDate, v)
+	return u
+}
+
+// UpdateLastSwitchDate sets the "last_switch_date" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateLastSwitchDate() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldLastSwitchDate)
+	return u
+}
+
+// ClearLastSwitchDate clears the value of the "last_switch_date" field.
+func (u *UserCharacterConfigUpsert) ClearLastSwitchDate() *UserCharacterConfigUpsert {
+	u.SetNull(usercharacterconfig.FieldLastSwitchDate)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *UserCharacterConfigUpsert) SetCreatedAt(v time.Time) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateCreatedAt() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UserCharacterConfigUpsert) SetUpdatedAt(v time.Time) *UserCharacterConfigUpsert {
+	u.Set(usercharacterconfig.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsert) UpdateUpdatedAt() *UserCharacterConfigUpsert {
+	u.SetExcluded(usercharacterconfig.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.UserCharacterConfig.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(usercharacterconfig.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *UserCharacterConfigUpsertOne) UpdateNewValues() *UserCharacterConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(usercharacterconfig.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.UserCharacterConfig.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *UserCharacterConfigUpsertOne) Ignore() *UserCharacterConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *UserCharacterConfigUpsertOne) DoNothing() *UserCharacterConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the UserCharacterConfigCreate.OnConflict
+// documentation for more info.
+func (u *UserCharacterConfigUpsertOne) Update(set func(*UserCharacterConfigUpsert)) *UserCharacterConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&UserCharacterConfigUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *UserCharacterConfigUpsertOne) SetUserID(v uuid.UUID) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateUserID() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetCharacterID sets the "character_id" field.
+func (u *UserCharacterConfigUpsertOne) SetCharacterID(v string) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCharacterID(v)
+	})
+}
+
+// UpdateCharacterID sets the "character_id" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateCharacterID() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCharacterID()
+	})
+}
+
+// SetCustomName sets the "custom_name" field.
+func (u *UserCharacterConfigUpsertOne) SetCustomName(v string) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCustomName(v)
+	})
+}
+
+// UpdateCustomName sets the "custom_name" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateCustomName() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCustomName()
+	})
+}
+
+// ClearCustomName clears the value of the "custom_name" field.
+func (u *UserCharacterConfigUpsertOne) ClearCustomName() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.ClearCustomName()
+	})
+}
+
+// SetCustomAvatarURL sets the "custom_avatar_url" field.
+func (u *UserCharacterConfigUpsertOne) SetCustomAvatarURL(v string) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCustomAvatarURL(v)
+	})
+}
+
+// UpdateCustomAvatarURL sets the "custom_avatar_url" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateCustomAvatarURL() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCustomAvatarURL()
+	})
+}
+
+// ClearCustomAvatarURL clears the value of the "custom_avatar_url" field.
+func (u *UserCharacterConfigUpsertOne) ClearCustomAvatarURL() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.ClearCustomAvatarURL()
+	})
+}
+
+// SetIntimacyLevel sets the "intimacy_level" field.
+func (u *UserCharacterConfigUpsertOne) SetIntimacyLevel(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIntimacyLevel(v)
+	})
+}
+
+// AddIntimacyLevel adds v to the "intimacy_level" field.
+func (u *UserCharacterConfigUpsertOne) AddIntimacyLevel(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddIntimacyLevel(v)
+	})
+}
+
+// UpdateIntimacyLevel sets the "intimacy_level" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateIntimacyLevel() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIntimacyLevel()
+	})
+}
+
+// SetIntimacyScore sets the "intimacy_score" field.
+func (u *UserCharacterConfigUpsertOne) SetIntimacyScore(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIntimacyScore(v)
+	})
+}
+
+// AddIntimacyScore adds v to the "intimacy_score" field.
+func (u *UserCharacterConfigUpsertOne) AddIntimacyScore(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddIntimacyScore(v)
+	})
+}
+
+// UpdateIntimacyScore sets the "intimacy_score" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateIntimacyScore() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIntimacyScore()
+	})
+}
+
+// SetUnlockedStories sets the "unlocked_stories" field.
+func (u *UserCharacterConfigUpsertOne) SetUnlockedStories(v []string) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUnlockedStories(v)
+	})
+}
+
+// UpdateUnlockedStories sets the "unlocked_stories" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateUnlockedStories() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUnlockedStories()
+	})
+}
+
+// SetUnlockedExpressions sets the "unlocked_expressions" field.
+func (u *UserCharacterConfigUpsertOne) SetUnlockedExpressions(v []string) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUnlockedExpressions(v)
+	})
+}
+
+// UpdateUnlockedExpressions sets the "unlocked_expressions" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateUnlockedExpressions() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUnlockedExpressions()
+	})
+}
+
+// SetUnlockedDeepNightMode sets the "unlocked_deep_night_mode" field.
+func (u *UserCharacterConfigUpsertOne) SetUnlockedDeepNightMode(v bool) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUnlockedDeepNightMode(v)
+	})
+}
+
+// UpdateUnlockedDeepNightMode sets the "unlocked_deep_night_mode" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateUnlockedDeepNightMode() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUnlockedDeepNightMode()
+	})
+}
+
+// SetTotalMessages sets the "total_messages" field.
+func (u *UserCharacterConfigUpsertOne) SetTotalMessages(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetTotalMessages(v)
+	})
+}
+
+// AddTotalMessages adds v to the "total_messages" field.
+func (u *UserCharacterConfigUpsertOne) AddTotalMessages(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddTotalMessages(v)
+	})
+}
+
+// UpdateTotalMessages sets the "total_messages" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateTotalMessages() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateTotalMessages()
+	})
+}
+
+// SetTotalGoalsCompleted sets the "total_goals_completed" field.
+func (u *UserCharacterConfigUpsertOne) SetTotalGoalsCompleted(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetTotalGoalsCompleted(v)
+	})
+}
+
+// AddTotalGoalsCompleted adds v to the "total_goals_completed" field.
+func (u *UserCharacterConfigUpsertOne) AddTotalGoalsCompleted(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddTotalGoalsCompleted(v)
+	})
+}
+
+// UpdateTotalGoalsCompleted sets the "total_goals_completed" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateTotalGoalsCompleted() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateTotalGoalsCompleted()
+	})
+}
+
+// SetIsActive sets the "is_active" field.
+func (u *UserCharacterConfigUpsertOne) SetIsActive(v bool) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIsActive(v)
+	})
+}
+
+// UpdateIsActive sets the "is_active" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateIsActive() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIsActive()
+	})
+}
+
+// SetIsFavorite sets the "is_favorite" field.
+func (u *UserCharacterConfigUpsertOne) SetIsFavorite(v bool) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIsFavorite(v)
+	})
+}
+
+// UpdateIsFavorite sets the "is_favorite" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateIsFavorite() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIsFavorite()
+	})
+}
+
+// SetSwitchCountThisMonth sets the "switch_count_this_month" field.
+func (u *UserCharacterConfigUpsertOne) SetSwitchCountThisMonth(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetSwitchCountThisMonth(v)
+	})
+}
+
+// AddSwitchCountThisMonth adds v to the "switch_count_this_month" field.
+func (u *UserCharacterConfigUpsertOne) AddSwitchCountThisMonth(v int) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddSwitchCountThisMonth(v)
+	})
+}
+
+// UpdateSwitchCountThisMonth sets the "switch_count_this_month" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateSwitchCountThisMonth() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateSwitchCountThisMonth()
+	})
+}
+
+// SetLastSwitchDate sets the "last_switch_date" field.
+func (u *UserCharacterConfigUpsertOne) SetLastSwitchDate(v time.Time) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetLastSwitchDate(v)
+	})
+}
+
+// UpdateLastSwitchDate sets the "last_switch_date" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateLastSwitchDate() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateLastSwitchDate()
+	})
+}
+
+// ClearLastSwitchDate clears the value of the "last_switch_date" field.
+func (u *UserCharacterConfigUpsertOne) ClearLastSwitchDate() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.ClearLastSwitchDate()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *UserCharacterConfigUpsertOne) SetCreatedAt(v time.Time) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateCreatedAt() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UserCharacterConfigUpsertOne) SetUpdatedAt(v time.Time) *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertOne) UpdateUpdatedAt() *UserCharacterConfigUpsertOne {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *UserCharacterConfigUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for UserCharacterConfigCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *UserCharacterConfigUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *UserCharacterConfigUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: UserCharacterConfigUpsertOne.ID is not supported by MySQL driver. Use UserCharacterConfigUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *UserCharacterConfigUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // UserCharacterConfigCreateBulk is the builder for creating many UserCharacterConfig entities in bulk.
 type UserCharacterConfigCreateBulk struct {
 	config
 	err      error
 	builders []*UserCharacterConfigCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the UserCharacterConfig entities in the database.
@@ -519,6 +1205,7 @@ func (_c *UserCharacterConfigCreateBulk) Save(ctx context.Context) ([]*UserChara
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -565,6 +1252,414 @@ func (_c *UserCharacterConfigCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *UserCharacterConfigCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.UserCharacterConfig.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.UserCharacterConfigUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *UserCharacterConfigCreateBulk) OnConflict(opts ...sql.ConflictOption) *UserCharacterConfigUpsertBulk {
+	_c.conflict = opts
+	return &UserCharacterConfigUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.UserCharacterConfig.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *UserCharacterConfigCreateBulk) OnConflictColumns(columns ...string) *UserCharacterConfigUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &UserCharacterConfigUpsertBulk{
+		create: _c,
+	}
+}
+
+// UserCharacterConfigUpsertBulk is the builder for "upsert"-ing
+// a bulk of UserCharacterConfig nodes.
+type UserCharacterConfigUpsertBulk struct {
+	create *UserCharacterConfigCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.UserCharacterConfig.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(usercharacterconfig.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *UserCharacterConfigUpsertBulk) UpdateNewValues() *UserCharacterConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(usercharacterconfig.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.UserCharacterConfig.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *UserCharacterConfigUpsertBulk) Ignore() *UserCharacterConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *UserCharacterConfigUpsertBulk) DoNothing() *UserCharacterConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the UserCharacterConfigCreateBulk.OnConflict
+// documentation for more info.
+func (u *UserCharacterConfigUpsertBulk) Update(set func(*UserCharacterConfigUpsert)) *UserCharacterConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&UserCharacterConfigUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *UserCharacterConfigUpsertBulk) SetUserID(v uuid.UUID) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateUserID() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetCharacterID sets the "character_id" field.
+func (u *UserCharacterConfigUpsertBulk) SetCharacterID(v string) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCharacterID(v)
+	})
+}
+
+// UpdateCharacterID sets the "character_id" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateCharacterID() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCharacterID()
+	})
+}
+
+// SetCustomName sets the "custom_name" field.
+func (u *UserCharacterConfigUpsertBulk) SetCustomName(v string) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCustomName(v)
+	})
+}
+
+// UpdateCustomName sets the "custom_name" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateCustomName() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCustomName()
+	})
+}
+
+// ClearCustomName clears the value of the "custom_name" field.
+func (u *UserCharacterConfigUpsertBulk) ClearCustomName() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.ClearCustomName()
+	})
+}
+
+// SetCustomAvatarURL sets the "custom_avatar_url" field.
+func (u *UserCharacterConfigUpsertBulk) SetCustomAvatarURL(v string) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCustomAvatarURL(v)
+	})
+}
+
+// UpdateCustomAvatarURL sets the "custom_avatar_url" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateCustomAvatarURL() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCustomAvatarURL()
+	})
+}
+
+// ClearCustomAvatarURL clears the value of the "custom_avatar_url" field.
+func (u *UserCharacterConfigUpsertBulk) ClearCustomAvatarURL() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.ClearCustomAvatarURL()
+	})
+}
+
+// SetIntimacyLevel sets the "intimacy_level" field.
+func (u *UserCharacterConfigUpsertBulk) SetIntimacyLevel(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIntimacyLevel(v)
+	})
+}
+
+// AddIntimacyLevel adds v to the "intimacy_level" field.
+func (u *UserCharacterConfigUpsertBulk) AddIntimacyLevel(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddIntimacyLevel(v)
+	})
+}
+
+// UpdateIntimacyLevel sets the "intimacy_level" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateIntimacyLevel() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIntimacyLevel()
+	})
+}
+
+// SetIntimacyScore sets the "intimacy_score" field.
+func (u *UserCharacterConfigUpsertBulk) SetIntimacyScore(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIntimacyScore(v)
+	})
+}
+
+// AddIntimacyScore adds v to the "intimacy_score" field.
+func (u *UserCharacterConfigUpsertBulk) AddIntimacyScore(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddIntimacyScore(v)
+	})
+}
+
+// UpdateIntimacyScore sets the "intimacy_score" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateIntimacyScore() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIntimacyScore()
+	})
+}
+
+// SetUnlockedStories sets the "unlocked_stories" field.
+func (u *UserCharacterConfigUpsertBulk) SetUnlockedStories(v []string) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUnlockedStories(v)
+	})
+}
+
+// UpdateUnlockedStories sets the "unlocked_stories" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateUnlockedStories() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUnlockedStories()
+	})
+}
+
+// SetUnlockedExpressions sets the "unlocked_expressions" field.
+func (u *UserCharacterConfigUpsertBulk) SetUnlockedExpressions(v []string) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUnlockedExpressions(v)
+	})
+}
+
+// UpdateUnlockedExpressions sets the "unlocked_expressions" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateUnlockedExpressions() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUnlockedExpressions()
+	})
+}
+
+// SetUnlockedDeepNightMode sets the "unlocked_deep_night_mode" field.
+func (u *UserCharacterConfigUpsertBulk) SetUnlockedDeepNightMode(v bool) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUnlockedDeepNightMode(v)
+	})
+}
+
+// UpdateUnlockedDeepNightMode sets the "unlocked_deep_night_mode" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateUnlockedDeepNightMode() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUnlockedDeepNightMode()
+	})
+}
+
+// SetTotalMessages sets the "total_messages" field.
+func (u *UserCharacterConfigUpsertBulk) SetTotalMessages(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetTotalMessages(v)
+	})
+}
+
+// AddTotalMessages adds v to the "total_messages" field.
+func (u *UserCharacterConfigUpsertBulk) AddTotalMessages(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddTotalMessages(v)
+	})
+}
+
+// UpdateTotalMessages sets the "total_messages" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateTotalMessages() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateTotalMessages()
+	})
+}
+
+// SetTotalGoalsCompleted sets the "total_goals_completed" field.
+func (u *UserCharacterConfigUpsertBulk) SetTotalGoalsCompleted(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetTotalGoalsCompleted(v)
+	})
+}
+
+// AddTotalGoalsCompleted adds v to the "total_goals_completed" field.
+func (u *UserCharacterConfigUpsertBulk) AddTotalGoalsCompleted(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddTotalGoalsCompleted(v)
+	})
+}
+
+// UpdateTotalGoalsCompleted sets the "total_goals_completed" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateTotalGoalsCompleted() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateTotalGoalsCompleted()
+	})
+}
+
+// SetIsActive sets the "is_active" field.
+func (u *UserCharacterConfigUpsertBulk) SetIsActive(v bool) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIsActive(v)
+	})
+}
+
+// UpdateIsActive sets the "is_active" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateIsActive() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIsActive()
+	})
+}
+
+// SetIsFavorite sets the "is_favorite" field.
+func (u *UserCharacterConfigUpsertBulk) SetIsFavorite(v bool) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetIsFavorite(v)
+	})
+}
+
+// UpdateIsFavorite sets the "is_favorite" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateIsFavorite() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateIsFavorite()
+	})
+}
+
+// SetSwitchCountThisMonth sets the "switch_count_this_month" field.
+func (u *UserCharacterConfigUpsertBulk) SetSwitchCountThisMonth(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetSwitchCountThisMonth(v)
+	})
+}
+
+// AddSwitchCountThisMonth adds v to the "switch_count_this_month" field.
+func (u *UserCharacterConfigUpsertBulk) AddSwitchCountThisMonth(v int) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.AddSwitchCountThisMonth(v)
+	})
+}
+
+// UpdateSwitchCountThisMonth sets the "switch_count_this_month" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateSwitchCountThisMonth() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateSwitchCountThisMonth()
+	})
+}
+
+// SetLastSwitchDate sets the "last_switch_date" field.
+func (u *UserCharacterConfigUpsertBulk) SetLastSwitchDate(v time.Time) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetLastSwitchDate(v)
+	})
+}
+
+// UpdateLastSwitchDate sets the "last_switch_date" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateLastSwitchDate() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateLastSwitchDate()
+	})
+}
+
+// ClearLastSwitchDate clears the value of the "last_switch_date" field.
+func (u *UserCharacterConfigUpsertBulk) ClearLastSwitchDate() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.ClearLastSwitchDate()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *UserCharacterConfigUpsertBulk) SetCreatedAt(v time.Time) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateCreatedAt() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *UserCharacterConfigUpsertBulk) SetUpdatedAt(v time.Time) *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *UserCharacterConfigUpsertBulk) UpdateUpdatedAt() *UserCharacterConfigUpsertBulk {
+	return u.Update(func(s *UserCharacterConfigUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *UserCharacterConfigUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the UserCharacterConfigCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for UserCharacterConfigCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *UserCharacterConfigUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

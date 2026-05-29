@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -19,6 +21,7 @@ type FocusSessionCreate struct {
 	config
 	mutation *FocusSessionMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetUserID sets the "user_id" field.
@@ -203,6 +206,7 @@ func (_c *FocusSessionCreate) createSpec() (*FocusSession, *sqlgraph.CreateSpec)
 		_node = &FocusSession{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(focussession.Table, sqlgraph.NewFieldSpec(focussession.FieldID, field.TypeUUID))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
@@ -238,11 +242,381 @@ func (_c *FocusSessionCreate) createSpec() (*FocusSession, *sqlgraph.CreateSpec)
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.FocusSession.Create().
+//		SetUserID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FocusSessionUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *FocusSessionCreate) OnConflict(opts ...sql.ConflictOption) *FocusSessionUpsertOne {
+	_c.conflict = opts
+	return &FocusSessionUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.FocusSession.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *FocusSessionCreate) OnConflictColumns(columns ...string) *FocusSessionUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &FocusSessionUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// FocusSessionUpsertOne is the builder for "upsert"-ing
+	//  one FocusSession node.
+	FocusSessionUpsertOne struct {
+		create *FocusSessionCreate
+	}
+
+	// FocusSessionUpsert is the "OnConflict" setter.
+	FocusSessionUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUserID sets the "user_id" field.
+func (u *FocusSessionUpsert) SetUserID(v uuid.UUID) *FocusSessionUpsert {
+	u.Set(focussession.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *FocusSessionUpsert) UpdateUserID() *FocusSessionUpsert {
+	u.SetExcluded(focussession.FieldUserID)
+	return u
+}
+
+// SetStartTime sets the "start_time" field.
+func (u *FocusSessionUpsert) SetStartTime(v time.Time) *FocusSessionUpsert {
+	u.Set(focussession.FieldStartTime, v)
+	return u
+}
+
+// UpdateStartTime sets the "start_time" field to the value that was provided on create.
+func (u *FocusSessionUpsert) UpdateStartTime() *FocusSessionUpsert {
+	u.SetExcluded(focussession.FieldStartTime)
+	return u
+}
+
+// SetDuration sets the "duration" field.
+func (u *FocusSessionUpsert) SetDuration(v int) *FocusSessionUpsert {
+	u.Set(focussession.FieldDuration, v)
+	return u
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *FocusSessionUpsert) UpdateDuration() *FocusSessionUpsert {
+	u.SetExcluded(focussession.FieldDuration)
+	return u
+}
+
+// AddDuration adds v to the "duration" field.
+func (u *FocusSessionUpsert) AddDuration(v int) *FocusSessionUpsert {
+	u.Add(focussession.FieldDuration, v)
+	return u
+}
+
+// SetFocusQualityScore sets the "focus_quality_score" field.
+func (u *FocusSessionUpsert) SetFocusQualityScore(v float64) *FocusSessionUpsert {
+	u.Set(focussession.FieldFocusQualityScore, v)
+	return u
+}
+
+// UpdateFocusQualityScore sets the "focus_quality_score" field to the value that was provided on create.
+func (u *FocusSessionUpsert) UpdateFocusQualityScore() *FocusSessionUpsert {
+	u.SetExcluded(focussession.FieldFocusQualityScore)
+	return u
+}
+
+// AddFocusQualityScore adds v to the "focus_quality_score" field.
+func (u *FocusSessionUpsert) AddFocusQualityScore(v float64) *FocusSessionUpsert {
+	u.Add(focussession.FieldFocusQualityScore, v)
+	return u
+}
+
+// ClearFocusQualityScore clears the value of the "focus_quality_score" field.
+func (u *FocusSessionUpsert) ClearFocusQualityScore() *FocusSessionUpsert {
+	u.SetNull(focussession.FieldFocusQualityScore)
+	return u
+}
+
+// SetDistractions sets the "distractions" field.
+func (u *FocusSessionUpsert) SetDistractions(v []string) *FocusSessionUpsert {
+	u.Set(focussession.FieldDistractions, v)
+	return u
+}
+
+// UpdateDistractions sets the "distractions" field to the value that was provided on create.
+func (u *FocusSessionUpsert) UpdateDistractions() *FocusSessionUpsert {
+	u.SetExcluded(focussession.FieldDistractions)
+	return u
+}
+
+// SetContext sets the "context" field.
+func (u *FocusSessionUpsert) SetContext(v string) *FocusSessionUpsert {
+	u.Set(focussession.FieldContext, v)
+	return u
+}
+
+// UpdateContext sets the "context" field to the value that was provided on create.
+func (u *FocusSessionUpsert) UpdateContext() *FocusSessionUpsert {
+	u.SetExcluded(focussession.FieldContext)
+	return u
+}
+
+// ClearContext clears the value of the "context" field.
+func (u *FocusSessionUpsert) ClearContext() *FocusSessionUpsert {
+	u.SetNull(focussession.FieldContext)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *FocusSessionUpsert) SetCreatedAt(v time.Time) *FocusSessionUpsert {
+	u.Set(focussession.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *FocusSessionUpsert) UpdateCreatedAt() *FocusSessionUpsert {
+	u.SetExcluded(focussession.FieldCreatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.FocusSession.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(focussession.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FocusSessionUpsertOne) UpdateNewValues() *FocusSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(focussession.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.FocusSession.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *FocusSessionUpsertOne) Ignore() *FocusSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FocusSessionUpsertOne) DoNothing() *FocusSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FocusSessionCreate.OnConflict
+// documentation for more info.
+func (u *FocusSessionUpsertOne) Update(set func(*FocusSessionUpsert)) *FocusSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FocusSessionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *FocusSessionUpsertOne) SetUserID(v uuid.UUID) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *FocusSessionUpsertOne) UpdateUserID() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetStartTime sets the "start_time" field.
+func (u *FocusSessionUpsertOne) SetStartTime(v time.Time) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetStartTime(v)
+	})
+}
+
+// UpdateStartTime sets the "start_time" field to the value that was provided on create.
+func (u *FocusSessionUpsertOne) UpdateStartTime() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateStartTime()
+	})
+}
+
+// SetDuration sets the "duration" field.
+func (u *FocusSessionUpsertOne) SetDuration(v int) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetDuration(v)
+	})
+}
+
+// AddDuration adds v to the "duration" field.
+func (u *FocusSessionUpsertOne) AddDuration(v int) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.AddDuration(v)
+	})
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *FocusSessionUpsertOne) UpdateDuration() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateDuration()
+	})
+}
+
+// SetFocusQualityScore sets the "focus_quality_score" field.
+func (u *FocusSessionUpsertOne) SetFocusQualityScore(v float64) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetFocusQualityScore(v)
+	})
+}
+
+// AddFocusQualityScore adds v to the "focus_quality_score" field.
+func (u *FocusSessionUpsertOne) AddFocusQualityScore(v float64) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.AddFocusQualityScore(v)
+	})
+}
+
+// UpdateFocusQualityScore sets the "focus_quality_score" field to the value that was provided on create.
+func (u *FocusSessionUpsertOne) UpdateFocusQualityScore() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateFocusQualityScore()
+	})
+}
+
+// ClearFocusQualityScore clears the value of the "focus_quality_score" field.
+func (u *FocusSessionUpsertOne) ClearFocusQualityScore() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.ClearFocusQualityScore()
+	})
+}
+
+// SetDistractions sets the "distractions" field.
+func (u *FocusSessionUpsertOne) SetDistractions(v []string) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetDistractions(v)
+	})
+}
+
+// UpdateDistractions sets the "distractions" field to the value that was provided on create.
+func (u *FocusSessionUpsertOne) UpdateDistractions() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateDistractions()
+	})
+}
+
+// SetContext sets the "context" field.
+func (u *FocusSessionUpsertOne) SetContext(v string) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetContext(v)
+	})
+}
+
+// UpdateContext sets the "context" field to the value that was provided on create.
+func (u *FocusSessionUpsertOne) UpdateContext() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateContext()
+	})
+}
+
+// ClearContext clears the value of the "context" field.
+func (u *FocusSessionUpsertOne) ClearContext() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.ClearContext()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *FocusSessionUpsertOne) SetCreatedAt(v time.Time) *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *FocusSessionUpsertOne) UpdateCreatedAt() *FocusSessionUpsertOne {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *FocusSessionUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FocusSessionCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FocusSessionUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *FocusSessionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: FocusSessionUpsertOne.ID is not supported by MySQL driver. Use FocusSessionUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *FocusSessionUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // FocusSessionCreateBulk is the builder for creating many FocusSession entities in bulk.
 type FocusSessionCreateBulk struct {
 	config
 	err      error
 	builders []*FocusSessionCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the FocusSession entities in the database.
@@ -272,6 +646,7 @@ func (_c *FocusSessionCreateBulk) Save(ctx context.Context) ([]*FocusSession, er
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -318,6 +693,246 @@ func (_c *FocusSessionCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *FocusSessionCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.FocusSession.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FocusSessionUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *FocusSessionCreateBulk) OnConflict(opts ...sql.ConflictOption) *FocusSessionUpsertBulk {
+	_c.conflict = opts
+	return &FocusSessionUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.FocusSession.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *FocusSessionCreateBulk) OnConflictColumns(columns ...string) *FocusSessionUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &FocusSessionUpsertBulk{
+		create: _c,
+	}
+}
+
+// FocusSessionUpsertBulk is the builder for "upsert"-ing
+// a bulk of FocusSession nodes.
+type FocusSessionUpsertBulk struct {
+	create *FocusSessionCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.FocusSession.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(focussession.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FocusSessionUpsertBulk) UpdateNewValues() *FocusSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(focussession.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.FocusSession.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *FocusSessionUpsertBulk) Ignore() *FocusSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FocusSessionUpsertBulk) DoNothing() *FocusSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FocusSessionCreateBulk.OnConflict
+// documentation for more info.
+func (u *FocusSessionUpsertBulk) Update(set func(*FocusSessionUpsert)) *FocusSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FocusSessionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *FocusSessionUpsertBulk) SetUserID(v uuid.UUID) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *FocusSessionUpsertBulk) UpdateUserID() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetStartTime sets the "start_time" field.
+func (u *FocusSessionUpsertBulk) SetStartTime(v time.Time) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetStartTime(v)
+	})
+}
+
+// UpdateStartTime sets the "start_time" field to the value that was provided on create.
+func (u *FocusSessionUpsertBulk) UpdateStartTime() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateStartTime()
+	})
+}
+
+// SetDuration sets the "duration" field.
+func (u *FocusSessionUpsertBulk) SetDuration(v int) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetDuration(v)
+	})
+}
+
+// AddDuration adds v to the "duration" field.
+func (u *FocusSessionUpsertBulk) AddDuration(v int) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.AddDuration(v)
+	})
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *FocusSessionUpsertBulk) UpdateDuration() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateDuration()
+	})
+}
+
+// SetFocusQualityScore sets the "focus_quality_score" field.
+func (u *FocusSessionUpsertBulk) SetFocusQualityScore(v float64) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetFocusQualityScore(v)
+	})
+}
+
+// AddFocusQualityScore adds v to the "focus_quality_score" field.
+func (u *FocusSessionUpsertBulk) AddFocusQualityScore(v float64) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.AddFocusQualityScore(v)
+	})
+}
+
+// UpdateFocusQualityScore sets the "focus_quality_score" field to the value that was provided on create.
+func (u *FocusSessionUpsertBulk) UpdateFocusQualityScore() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateFocusQualityScore()
+	})
+}
+
+// ClearFocusQualityScore clears the value of the "focus_quality_score" field.
+func (u *FocusSessionUpsertBulk) ClearFocusQualityScore() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.ClearFocusQualityScore()
+	})
+}
+
+// SetDistractions sets the "distractions" field.
+func (u *FocusSessionUpsertBulk) SetDistractions(v []string) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetDistractions(v)
+	})
+}
+
+// UpdateDistractions sets the "distractions" field to the value that was provided on create.
+func (u *FocusSessionUpsertBulk) UpdateDistractions() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateDistractions()
+	})
+}
+
+// SetContext sets the "context" field.
+func (u *FocusSessionUpsertBulk) SetContext(v string) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetContext(v)
+	})
+}
+
+// UpdateContext sets the "context" field to the value that was provided on create.
+func (u *FocusSessionUpsertBulk) UpdateContext() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateContext()
+	})
+}
+
+// ClearContext clears the value of the "context" field.
+func (u *FocusSessionUpsertBulk) ClearContext() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.ClearContext()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *FocusSessionUpsertBulk) SetCreatedAt(v time.Time) *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *FocusSessionUpsertBulk) UpdateCreatedAt() *FocusSessionUpsertBulk {
+	return u.Update(func(s *FocusSessionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *FocusSessionUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the FocusSessionCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FocusSessionCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FocusSessionUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

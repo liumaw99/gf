@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
@@ -19,6 +21,7 @@ type DailyLogCreate struct {
 	config
 	mutation *DailyLogMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetUserID sets the "user_id" field.
@@ -169,6 +172,7 @@ func (_c *DailyLogCreate) createSpec() (*DailyLog, *sqlgraph.CreateSpec) {
 		_node = &DailyLog{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(dailylog.Table, sqlgraph.NewFieldSpec(dailylog.FieldID, field.TypeUUID))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
@@ -196,11 +200,329 @@ func (_c *DailyLogCreate) createSpec() (*DailyLog, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.DailyLog.Create().
+//		SetUserID(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DailyLogUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *DailyLogCreate) OnConflict(opts ...sql.ConflictOption) *DailyLogUpsertOne {
+	_c.conflict = opts
+	return &DailyLogUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.DailyLog.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *DailyLogCreate) OnConflictColumns(columns ...string) *DailyLogUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &DailyLogUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// DailyLogUpsertOne is the builder for "upsert"-ing
+	//  one DailyLog node.
+	DailyLogUpsertOne struct {
+		create *DailyLogCreate
+	}
+
+	// DailyLogUpsert is the "OnConflict" setter.
+	DailyLogUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUserID sets the "user_id" field.
+func (u *DailyLogUpsert) SetUserID(v uuid.UUID) *DailyLogUpsert {
+	u.Set(dailylog.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *DailyLogUpsert) UpdateUserID() *DailyLogUpsert {
+	u.SetExcluded(dailylog.FieldUserID)
+	return u
+}
+
+// SetDate sets the "date" field.
+func (u *DailyLogUpsert) SetDate(v time.Time) *DailyLogUpsert {
+	u.Set(dailylog.FieldDate, v)
+	return u
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *DailyLogUpsert) UpdateDate() *DailyLogUpsert {
+	u.SetExcluded(dailylog.FieldDate)
+	return u
+}
+
+// SetMoodScore sets the "mood_score" field.
+func (u *DailyLogUpsert) SetMoodScore(v int) *DailyLogUpsert {
+	u.Set(dailylog.FieldMoodScore, v)
+	return u
+}
+
+// UpdateMoodScore sets the "mood_score" field to the value that was provided on create.
+func (u *DailyLogUpsert) UpdateMoodScore() *DailyLogUpsert {
+	u.SetExcluded(dailylog.FieldMoodScore)
+	return u
+}
+
+// AddMoodScore adds v to the "mood_score" field.
+func (u *DailyLogUpsert) AddMoodScore(v int) *DailyLogUpsert {
+	u.Add(dailylog.FieldMoodScore, v)
+	return u
+}
+
+// ClearMoodScore clears the value of the "mood_score" field.
+func (u *DailyLogUpsert) ClearMoodScore() *DailyLogUpsert {
+	u.SetNull(dailylog.FieldMoodScore)
+	return u
+}
+
+// SetReflectionNote sets the "reflection_note" field.
+func (u *DailyLogUpsert) SetReflectionNote(v string) *DailyLogUpsert {
+	u.Set(dailylog.FieldReflectionNote, v)
+	return u
+}
+
+// UpdateReflectionNote sets the "reflection_note" field to the value that was provided on create.
+func (u *DailyLogUpsert) UpdateReflectionNote() *DailyLogUpsert {
+	u.SetExcluded(dailylog.FieldReflectionNote)
+	return u
+}
+
+// ClearReflectionNote clears the value of the "reflection_note" field.
+func (u *DailyLogUpsert) ClearReflectionNote() *DailyLogUpsert {
+	u.SetNull(dailylog.FieldReflectionNote)
+	return u
+}
+
+// SetSummary sets the "summary" field.
+func (u *DailyLogUpsert) SetSummary(v string) *DailyLogUpsert {
+	u.Set(dailylog.FieldSummary, v)
+	return u
+}
+
+// UpdateSummary sets the "summary" field to the value that was provided on create.
+func (u *DailyLogUpsert) UpdateSummary() *DailyLogUpsert {
+	u.SetExcluded(dailylog.FieldSummary)
+	return u
+}
+
+// ClearSummary clears the value of the "summary" field.
+func (u *DailyLogUpsert) ClearSummary() *DailyLogUpsert {
+	u.SetNull(dailylog.FieldSummary)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.DailyLog.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(dailylog.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *DailyLogUpsertOne) UpdateNewValues() *DailyLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(dailylog.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.DailyLog.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *DailyLogUpsertOne) Ignore() *DailyLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *DailyLogUpsertOne) DoNothing() *DailyLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the DailyLogCreate.OnConflict
+// documentation for more info.
+func (u *DailyLogUpsertOne) Update(set func(*DailyLogUpsert)) *DailyLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&DailyLogUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *DailyLogUpsertOne) SetUserID(v uuid.UUID) *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *DailyLogUpsertOne) UpdateUserID() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetDate sets the "date" field.
+func (u *DailyLogUpsertOne) SetDate(v time.Time) *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetDate(v)
+	})
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *DailyLogUpsertOne) UpdateDate() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateDate()
+	})
+}
+
+// SetMoodScore sets the "mood_score" field.
+func (u *DailyLogUpsertOne) SetMoodScore(v int) *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetMoodScore(v)
+	})
+}
+
+// AddMoodScore adds v to the "mood_score" field.
+func (u *DailyLogUpsertOne) AddMoodScore(v int) *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.AddMoodScore(v)
+	})
+}
+
+// UpdateMoodScore sets the "mood_score" field to the value that was provided on create.
+func (u *DailyLogUpsertOne) UpdateMoodScore() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateMoodScore()
+	})
+}
+
+// ClearMoodScore clears the value of the "mood_score" field.
+func (u *DailyLogUpsertOne) ClearMoodScore() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.ClearMoodScore()
+	})
+}
+
+// SetReflectionNote sets the "reflection_note" field.
+func (u *DailyLogUpsertOne) SetReflectionNote(v string) *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetReflectionNote(v)
+	})
+}
+
+// UpdateReflectionNote sets the "reflection_note" field to the value that was provided on create.
+func (u *DailyLogUpsertOne) UpdateReflectionNote() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateReflectionNote()
+	})
+}
+
+// ClearReflectionNote clears the value of the "reflection_note" field.
+func (u *DailyLogUpsertOne) ClearReflectionNote() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.ClearReflectionNote()
+	})
+}
+
+// SetSummary sets the "summary" field.
+func (u *DailyLogUpsertOne) SetSummary(v string) *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetSummary(v)
+	})
+}
+
+// UpdateSummary sets the "summary" field to the value that was provided on create.
+func (u *DailyLogUpsertOne) UpdateSummary() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateSummary()
+	})
+}
+
+// ClearSummary clears the value of the "summary" field.
+func (u *DailyLogUpsertOne) ClearSummary() *DailyLogUpsertOne {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.ClearSummary()
+	})
+}
+
+// Exec executes the query.
+func (u *DailyLogUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for DailyLogCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *DailyLogUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *DailyLogUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: DailyLogUpsertOne.ID is not supported by MySQL driver. Use DailyLogUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *DailyLogUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // DailyLogCreateBulk is the builder for creating many DailyLog entities in bulk.
 type DailyLogCreateBulk struct {
 	config
 	err      error
 	builders []*DailyLogCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the DailyLog entities in the database.
@@ -230,6 +552,7 @@ func (_c *DailyLogCreateBulk) Save(ctx context.Context) ([]*DailyLog, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -276,6 +599,218 @@ func (_c *DailyLogCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *DailyLogCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.DailyLog.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DailyLogUpsert) {
+//			SetUserID(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *DailyLogCreateBulk) OnConflict(opts ...sql.ConflictOption) *DailyLogUpsertBulk {
+	_c.conflict = opts
+	return &DailyLogUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.DailyLog.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *DailyLogCreateBulk) OnConflictColumns(columns ...string) *DailyLogUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &DailyLogUpsertBulk{
+		create: _c,
+	}
+}
+
+// DailyLogUpsertBulk is the builder for "upsert"-ing
+// a bulk of DailyLog nodes.
+type DailyLogUpsertBulk struct {
+	create *DailyLogCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.DailyLog.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(dailylog.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *DailyLogUpsertBulk) UpdateNewValues() *DailyLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(dailylog.FieldID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.DailyLog.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *DailyLogUpsertBulk) Ignore() *DailyLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *DailyLogUpsertBulk) DoNothing() *DailyLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the DailyLogCreateBulk.OnConflict
+// documentation for more info.
+func (u *DailyLogUpsertBulk) Update(set func(*DailyLogUpsert)) *DailyLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&DailyLogUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *DailyLogUpsertBulk) SetUserID(v uuid.UUID) *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *DailyLogUpsertBulk) UpdateUserID() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// SetDate sets the "date" field.
+func (u *DailyLogUpsertBulk) SetDate(v time.Time) *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetDate(v)
+	})
+}
+
+// UpdateDate sets the "date" field to the value that was provided on create.
+func (u *DailyLogUpsertBulk) UpdateDate() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateDate()
+	})
+}
+
+// SetMoodScore sets the "mood_score" field.
+func (u *DailyLogUpsertBulk) SetMoodScore(v int) *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetMoodScore(v)
+	})
+}
+
+// AddMoodScore adds v to the "mood_score" field.
+func (u *DailyLogUpsertBulk) AddMoodScore(v int) *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.AddMoodScore(v)
+	})
+}
+
+// UpdateMoodScore sets the "mood_score" field to the value that was provided on create.
+func (u *DailyLogUpsertBulk) UpdateMoodScore() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateMoodScore()
+	})
+}
+
+// ClearMoodScore clears the value of the "mood_score" field.
+func (u *DailyLogUpsertBulk) ClearMoodScore() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.ClearMoodScore()
+	})
+}
+
+// SetReflectionNote sets the "reflection_note" field.
+func (u *DailyLogUpsertBulk) SetReflectionNote(v string) *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetReflectionNote(v)
+	})
+}
+
+// UpdateReflectionNote sets the "reflection_note" field to the value that was provided on create.
+func (u *DailyLogUpsertBulk) UpdateReflectionNote() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateReflectionNote()
+	})
+}
+
+// ClearReflectionNote clears the value of the "reflection_note" field.
+func (u *DailyLogUpsertBulk) ClearReflectionNote() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.ClearReflectionNote()
+	})
+}
+
+// SetSummary sets the "summary" field.
+func (u *DailyLogUpsertBulk) SetSummary(v string) *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.SetSummary(v)
+	})
+}
+
+// UpdateSummary sets the "summary" field to the value that was provided on create.
+func (u *DailyLogUpsertBulk) UpdateSummary() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.UpdateSummary()
+	})
+}
+
+// ClearSummary clears the value of the "summary" field.
+func (u *DailyLogUpsertBulk) ClearSummary() *DailyLogUpsertBulk {
+	return u.Update(func(s *DailyLogUpsert) {
+		s.ClearSummary()
+	})
+}
+
+// Exec executes the query.
+func (u *DailyLogUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the DailyLogCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for DailyLogCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *DailyLogUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

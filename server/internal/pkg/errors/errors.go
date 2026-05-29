@@ -107,3 +107,12 @@ var (
 	ErrNotImplemented  = New(1007, 501, "功能尚未实现")
 	ErrTooManyRequests = New(1008, 429, "请求过于频繁")
 )
+
+// 预定义认证模块业务错误（2001-2099）。
+var (
+	ErrEmailExists        = New(2001, 409, "邮箱已存在")
+	ErrInvalidCredentials = New(2002, 401, "邮箱或密码错误")
+	ErrUserNotFound       = New(2003, 404, "用户不存在")
+	ErrInvalidToken       = New(2004, 401, "无效的令牌")
+	ErrTokenRevoked       = New(2005, 401, "令牌已被吊销")
+)

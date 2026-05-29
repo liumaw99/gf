@@ -5,11 +5,13 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 // Claims JWT 声明
 type Claims struct {
 	UserID string `json:"user_id"`
+	JTI    string `json:"jti"`
 	jwt.RegisteredClaims
 }
 
@@ -27,6 +29,7 @@ func NewManager(secret string) *Manager {
 func (m *Manager) Generate(userID string, ttl time.Duration) (string, error) {
 	claims := Claims{
 		UserID: userID,
+		JTI:    uuid.NewString(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

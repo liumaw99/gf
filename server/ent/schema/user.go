@@ -32,6 +32,10 @@ func (User) Fields() []ent.Field {
 		field.String("email").
 			Optional().
 			Nillable(),
+		field.String("password_hash").
+			Optional().
+			Nillable().
+			Sensitive(),
 		field.String("name").
 			Optional().
 			Nillable(),
@@ -74,6 +78,8 @@ func (User) Indexes() []ent.Index {
 		index.Fields("apple_id").
 			Unique(),
 		index.Fields("google_id").
+			Unique(),
+		index.Fields("email").
 			Unique(),
 	}
 }

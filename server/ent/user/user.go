@@ -20,6 +20,8 @@ const (
 	FieldGoogleID = "google_id"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
+	// FieldPasswordHash holds the string denoting the password_hash field in the database.
+	FieldPasswordHash = "password_hash"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldAvatarURL holds the string denoting the avatar_url field in the database.
@@ -42,6 +44,7 @@ var Columns = []string{
 	FieldAppleID,
 	FieldGoogleID,
 	FieldEmail,
+	FieldPasswordHash,
 	FieldName,
 	FieldAvatarURL,
 	FieldSubscriptionTier,
@@ -94,6 +97,11 @@ func ByGoogleID(opts ...sql.OrderTermOption) OrderOption {
 // ByEmail orders the results by the email field.
 func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmail, opts...).ToFunc()
+}
+
+// ByPasswordHash orders the results by the password_hash field.
+func ByPasswordHash(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPasswordHash, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

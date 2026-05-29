@@ -9,6 +9,7 @@ import (
 	"github.com/lagom/lagom-server/config"
 	"github.com/lagom/lagom-server/ent"
 	"github.com/lagom/lagom-server/internal/handler"
+	"github.com/lagom/lagom-server/internal/pkg/jwt"
 	"github.com/lagom/lagom-server/internal/pkg/redis"
 )
 
@@ -26,6 +27,7 @@ func New(
 	cfg *config.Config,
 	client *ent.Client,
 	rdb *redis.Client,
+	jwtMgr *jwt.Manager,
 	authHandler *handler.AuthHandler,
 	chatHandler *handler.ChatHandler,
 	habitHandler *handler.HabitHandler,
@@ -37,7 +39,7 @@ func New(
 		gin.SetMode(gin.DebugMode)
 	}
 
-	router := setupRouter(cfg, client, rdb, authHandler, chatHandler, habitHandler, characterHandler)
+	router := setupRouter(cfg, client, rdb, jwtMgr, authHandler, chatHandler, habitHandler, characterHandler)
 
 	return &App{
 		router: router,

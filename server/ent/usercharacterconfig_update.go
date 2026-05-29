@@ -20,8 +20,9 @@ import (
 // UserCharacterConfigUpdate is the builder for updating UserCharacterConfig entities.
 type UserCharacterConfigUpdate struct {
 	config
-	hooks    []Hook
-	mutation *UserCharacterConfigMutation
+	hooks     []Hook
+	mutation  *UserCharacterConfigMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // Where appends a list predicates to the UserCharacterConfigUpdate builder.
@@ -360,6 +361,12 @@ func (_u *UserCharacterConfigUpdate) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *UserCharacterConfigUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *UserCharacterConfigUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *UserCharacterConfigUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -457,6 +464,7 @@ func (_u *UserCharacterConfigUpdate) sqlSave(ctx context.Context) (_node int, er
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(usercharacterconfig.FieldUpdatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{usercharacterconfig.Label}
@@ -472,9 +480,10 @@ func (_u *UserCharacterConfigUpdate) sqlSave(ctx context.Context) (_node int, er
 // UserCharacterConfigUpdateOne is the builder for updating a single UserCharacterConfig entity.
 type UserCharacterConfigUpdateOne struct {
 	config
-	fields   []string
-	hooks    []Hook
-	mutation *UserCharacterConfigMutation
+	fields    []string
+	hooks     []Hook
+	mutation  *UserCharacterConfigMutation
+	modifiers []func(*sql.UpdateBuilder)
 }
 
 // SetUserID sets the "user_id" field.
@@ -820,6 +829,12 @@ func (_u *UserCharacterConfigUpdateOne) check() error {
 	return nil
 }
 
+// Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
+func (_u *UserCharacterConfigUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *UserCharacterConfigUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
+}
+
 func (_u *UserCharacterConfigUpdateOne) sqlSave(ctx context.Context) (_node *UserCharacterConfig, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
@@ -934,6 +949,7 @@ func (_u *UserCharacterConfigUpdateOne) sqlSave(ctx context.Context) (_node *Use
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(usercharacterconfig.FieldUpdatedAt, field.TypeTime, value)
 	}
+	_spec.AddModifiers(_u.modifiers...)
 	_node = &UserCharacterConfig{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
