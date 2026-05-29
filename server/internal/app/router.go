@@ -10,35 +10,8 @@ import (
 	"github.com/lagom/lagom-server/internal/middleware"
 )
 
-// setupRouter 配置基础路由（无 handler 注入）
-func setupRouter(cfg *config.Config) *gin.Engine {
-	router := gin.New()
-	router.Use(gin.Recovery())
-	router.Use(requestLogger())
-	router.Use(middleware.CORS())
-
-	router.GET("/health", healthHandler)
-	router.GET("/ready", readinessHandler)
-
-	api := router.Group("/api/v1")
-	{
-		api.GET("/ping", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{"message": "pong"})
-		})
-	}
-
-	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"code":    404,
-			"message": "endpoint not found",
-		})
-	})
-
-	return router
-}
-
-// setupWireRouter 配置完整路由（Wire 注入 handler）
-func setupWireRouter(
+// setupRouter 配置完整路由
+func setupRouter(
 	cfg *config.Config,
 	authHandler *handler.AuthHandler,
 	chatHandler *handler.ChatHandler,

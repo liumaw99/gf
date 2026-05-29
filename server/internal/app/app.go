@@ -19,36 +19,8 @@ type App struct {
 	client *ent.Client
 }
 
-// New 创建应用实例（手动组装，用于测试）
-func New() (*App, error) {
-	cfg, err := config.Load()
-	if err != nil {
-		return nil, fmt.Errorf("load config: %w", err)
-	}
-	if err := cfg.Validate(); err != nil {
-		return nil, fmt.Errorf("validate config: %w", err)
-	}
-
-	if cfg.Server.Mode == "release" {
-		gin.SetMode(gin.ReleaseMode)
-	} else {
-		gin.SetMode(gin.DebugMode)
-	}
-
-	router := setupRouter(cfg)
-
-	return &App{
-		router: router,
-		cfg:    cfg,
-		server: &http.Server{
-			Addr:    fmt.Sprintf(":%d", cfg.Server.Port),
-			Handler: router,
-		},
-	}, nil
-}
-
-// NewWireApp 创建应用实例（Wire 注入）
-func NewWireApp(
+// New 创建应用实例（由 Wire 注入依赖）
+func New(
 	cfg *config.Config,
 	client *ent.Client,
 	authHandler *handler.AuthHandler,
@@ -62,7 +34,7 @@ func NewWireApp(
 		gin.SetMode(gin.DebugMode)
 	}
 
-	router := setupWireRouter(cfg, authHandler, chatHandler, habitHandler, characterHandler)
+	router := setupRouter(cfg, authHandler, chatHandler, habitHandler, characterHandler)
 
 	return &App{
 		router: router,

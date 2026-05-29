@@ -42,7 +42,7 @@ func InitializeApp() (*App, error) {
 	habitHandler := handler.NewHabitHandler(habitService)
 	characterService := service.NewCharacterService(configConfig, client)
 	characterHandler := handler.NewCharacterHandler(characterService)
-	app := NewWireApp(configConfig, client, authHandler, chatHandler, habitHandler, characterHandler)
+	app := New(configConfig, client, authHandler, chatHandler, habitHandler, characterHandler)
 	return app, nil
 }
 
@@ -67,5 +67,5 @@ func ProvideDeepSeekClient(cfg *config.Config) *ai.DeepSeekClient {
 var AppSet = wire.NewSet(config.Load, ProvideEntClient,
 
 	ProvideJWTManager,
-	ProvideDeepSeekClient, service.NewAuthService, service.NewAIService, service.NewHabitService, service.NewCharacterService, handler.NewAuthHandler, handler.NewChatHandler, handler.NewHabitHandler, handler.NewCharacterHandler, NewWireApp,
+	ProvideDeepSeekClient, service.NewAuthService, service.NewAIService, service.NewHabitService, service.NewCharacterService, handler.NewAuthHandler, handler.NewChatHandler, handler.NewHabitHandler, handler.NewCharacterHandler, New,
 )

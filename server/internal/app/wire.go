@@ -55,7 +55,7 @@ var AppSet = wire.NewSet(
 	handler.NewCharacterHandler,
 
 	// App
-	NewWireApp,
+	New,
 )
 
 // InitializeApp 初始化应用（由 Wire 生成）
