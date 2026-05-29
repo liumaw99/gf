@@ -19,7 +19,9 @@ run:
 # 热重载（需安装 air）
 dev:
 	@which air > /dev/null 2>&1 || go install github.com/air-verse/air@latest
-	air
+	LAGOM_DATABASE_DSN="postgres://lagom:lagom@localhost:5433/lagom?sslmode=disable" \
+	LAGOM_REDIS_ADDR="localhost:6380" \
+		air
 
 # 测试
 test:
