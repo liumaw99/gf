@@ -1,16 +1,16 @@
 {
   "info": {
     "_postman_id": "lagom-auth-001",
-    "name": "Lagom Auth API",
-    "description": "Lagom JWT 认证系统测试集合 — Register / Login / Refresh / Protected Routes",
+    "name": "Lagom 认证 API",
+    "description": "Lagom JWT 认证系统测试集合 — 注册 / 登录 / 刷新 / 受保护路由",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "🔓 Public",
+      "name": "🔓 公开接口",
       "item": [
         {
-          "name": "Health Check",
+          "name": "健康检查",
           "request": {
             "method": "GET",
             "header": [],
@@ -23,7 +23,7 @@
           "response": []
         },
         {
-          "name": "Ping",
+          "name": "连通测试",
           "request": {
             "method": "GET",
             "header": [],
@@ -36,7 +36,7 @@
           "response": []
         },
         {
-          "name": "Register",
+          "name": "注册",
           "event": [
             {
               "listen": "test",
@@ -84,7 +84,7 @@
           "response": []
         },
         {
-          "name": "Login",
+          "name": "登录",
           "event": [
             {
               "listen": "test",
@@ -132,7 +132,7 @@
           "response": []
         },
         {
-          "name": "Refresh Token",
+          "name": "刷新令牌",
           "event": [
             {
               "listen": "test",
@@ -181,10 +181,10 @@
       ]
     },
     {
-      "name": "🔒 Protected",
+      "name": "🔒 受保护接口",
       "item": [
         {
-          "name": "List Habits",
+          "name": "获取习惯列表",
           "event": [
             {
               "listen": "test",
@@ -220,7 +220,7 @@
           "response": []
         },
         {
-          "name": "Chat",
+          "name": "聊天",
           "request": {
             "method": "POST",
             "header": [
@@ -246,7 +246,7 @@
           "response": []
         },
         {
-          "name": "List Characters",
+          "name": "获取角色列表",
           "request": {
             "method": "GET",
             "header": [
@@ -266,10 +266,10 @@
       ]
     },
     {
-      "name": "❌ Negative Cases",
+      "name": "❌ 异常场景",
       "item": [
         {
-          "name": "Register - Duplicate Email",
+          "name": "注册 - 重复邮箱",
           "event": [
             {
               "listen": "test",
@@ -305,7 +305,7 @@
           "response": []
         },
         {
-          "name": "Login - Wrong Password",
+          "name": "登录 - 密码错误",
           "event": [
             {
               "listen": "test",
@@ -341,7 +341,7 @@
           "response": []
         },
         {
-          "name": "Protected - No Token",
+          "name": "访问受保护接口 - 无 Token",
           "event": [
             {
               "listen": "test",
@@ -368,7 +368,7 @@
           "response": []
         },
         {
-          "name": "Protected - Invalid Token",
+          "name": "访问受保护接口 - 无效 Token"
           "event": [
             {
               "listen": "test",
