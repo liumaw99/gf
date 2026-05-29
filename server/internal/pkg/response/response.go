@@ -62,12 +62,17 @@ func Created(c *gin.Context, data any) {
 	write(c, 0, "created", data)
 }
 
-// Page 返回分页数据响应。
+// Page 返回分页数据响应（兼容旧版：list + total）。
 func Page(c *gin.Context, list any, total int64) {
 	write(c, 0, "success", gin.H{
 		"list":  list,
 		"total": total,
 	})
+}
+
+// PageResult 返回分页数据响应（使用 pagination.Result）。
+func PageResult(c *gin.Context, result any) {
+	write(c, 0, "success", result)
 }
 
 // --- 错误响应 ---
