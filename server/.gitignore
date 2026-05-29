@@ -1,0 +1,42 @@
+# Binaries
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+server
+
+# Test
+*.test
+*.out
+coverage.html
+coverage.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+vendor/
+
+# Logs
+*.log
+
+# Air (hot reload)
+tmp/
+.air.toml
+
+# SQLC generated (if not checked in)
+# internal/repository/sqlc/*.sql.go
