@@ -1,10 +1,6 @@
 package middleware
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gin-gonic/gin"
 
 // RateLimiter 限流中间件（占位实现）
 func RateLimiter() gin.HandlerFunc {

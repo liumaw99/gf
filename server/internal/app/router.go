@@ -1,20 +1,20 @@
 package app
 
 import (
-	"fmt"
+	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lagom/lagom-server/config"
 )
 
 // setupRouter 配置路由
-func setupRouter(cfg *config.Config) *gin.Engine {
+func setupRouter(log *slog.Logger) *gin.Engine {
 	router := gin.New()
 
 	// 全局中间件
 	router.Use(gin.Recovery())
-	router.Use(requestLogger())
+	router.Use(requestLogger(log))
 	router.Use(corsMiddleware())
 
 	// 健康检查
@@ -59,7 +59,7 @@ func setupRouter(cfg *config.Config) *gin.Engine {
 // healthHandler 健康检查
 func healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"status": "healthy",
+		"status":  "healthy",
 		"service": "lagom-server",
 	})
 }
@@ -68,7 +68,7 @@ func healthHandler(c *gin.Context) {
 func readinessHandler(c *gin.Context) {
 	// TODO: 检查数据库、Redis 等依赖
 	c.JSON(http.StatusOK, gin.H{
-		"status": "ready",
+		"status":  "ready",
 		"service": "lagom-server",
 		"checks": gin.H{
 			"database": "ok",
@@ -78,17 +78,31 @@ func readinessHandler(c *gin.Context) {
 }
 
 // requestLogger 请求日志中间件
-func requestLogger() gin.HandlerFunc {
-	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		return fmt.Sprintf("%s | %3d | %13v | %15s | %-7s %s\n",
-			param.TimeStamp.Format("2006-01-02 15:04:05"),
-			param.StatusCode,
-			param.Latency,
-			param.ClientIP,
-			param.Method,
-			param.Path,
-		)
-	})
+func requestLogger(log *slog.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		c.Next()
+
+		attrs := []any{
+			"status", c.Writer.Status(),
+			"method", c.Request.Method,
+			"path", c.Request.URL.Path,
+			"client_ip", c.ClientIP(),
+			"latency", time.Since(start),
+			"bytes", c.Writer.Size(),
+		}
+
+		if len(c.Errors) > 0 {
+			attrs = append(attrs, "errors", c.Errors.String())
+		}
+
+		if c.Writer.Status() >= http.StatusInternalServerError {
+			log.Error("request completed", attrs...)
+			return
+		}
+
+		log.Info("request completed", attrs...)
+	}
 }
 
 // corsMiddleware CORS 中间件
