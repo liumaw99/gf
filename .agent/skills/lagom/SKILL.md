@@ -448,6 +448,56 @@ data: {"type":"delta","content":"！"}
 data: {"type":"done"}
 ```
 
+### 6.4 Postman Collection 维护规范
+
+**文件位置**：`docs/Lagom-Auth-API.postman_collection.json`
+
+**触发条件**：以下任一情况发生时，**必须同步更新** Postman Collection：
+- 新增/删除/修改路由（URL、Method）
+- 修改请求参数（字段增减、类型变化、校验规则）
+- 修改响应结构（data 字段变化、新增/删除字段）
+- 新增/修改错误码
+
+**更新规则**：
+```
+1. 保持现有 JSON 结构（Collection v2.1 格式）
+2. 新增接口：在对应 folder 内新增 item，复制同类请求的 header/body 格式
+3. 修改接口：更新 url、body、description，同步更新 Tests 脚本中的断言
+4. 删除接口：从 JSON 中移除对应 item，同步更新 Tests 中引用的变量
+5. 变量变更：如新增请求级变量，添加到 collectionVariables
+6. 中文化：所有 name、description 使用中文
+```
+
+**Tests 脚本规范**（每个请求必须包含）：
+```javascript
+// 状态码断言
+pm.test('Status code is 200', function () {
+  pm.response.to.have.status(200);
+});
+
+// 业务码断言
+var jsonData = pm.response.json();
+pm.test('Business code is 0', function () {
+  pm.expect(jsonData.code).to.eql(0);
+});
+
+// Token 自动提取（Register/Login/Refresh 专用）
+if (jsonData.data && jsonData.data.access_token) {
+  pm.collectionVariables.set('accessToken', jsonData.data.access_token);
+  pm.collectionVariables.set('refreshToken', jsonData.data.refresh_token);
+}
+```
+
+**自动化指令**（在会话中触发）：
+> "更新 Postman 集合" / "同步 Postman" / "接口变了更新 Postman"
+
+当收到上述指令时，执行以下步骤：
+1. 扫描 `internal/app/router.go` 获取最新路由列表
+2. 扫描 `internal/handler/*_handler.go` 获取请求/响应 DTO
+3. 对比现有 Postman JSON，找出差异
+4. 更新 JSON 文件，保持格式一致
+5. 提交时一并提交 JSON 变更
+
 ---
 
 ## 七、数据库规范
