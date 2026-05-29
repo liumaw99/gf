@@ -18,7 +18,7 @@ run:
 
 # 热重载（需安装 air）
 dev:
-	@which air > /dev/null 2>&1 || go install github.com/cosmtrek/air@latest
+	@which air > /dev/null 2>&1 || go install github.com/air-verse/air@latest
 	air
 
 # 测试
