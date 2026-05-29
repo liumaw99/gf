@@ -37,7 +37,7 @@ func New(
 		gin.SetMode(gin.DebugMode)
 	}
 
-	router := setupRouter(cfg, authHandler, chatHandler, habitHandler, characterHandler)
+	router := setupRouter(cfg, client, rdb, authHandler, chatHandler, habitHandler, characterHandler)
 
 	return &App{
 		router: router,
