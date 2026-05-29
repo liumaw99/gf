@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -31,7 +30,7 @@ func setupRouter(
 	router.Use(gin.Recovery())
 
 	// 2. 结构化请求日志
-	router.Use(structuredLogger())
+	router.Use(middleware.Logger())
 
 	// 3. 限流（公开路由层）— 基于 Redis 的占位实现
 	router.Use(middleware.RateLimiter())
@@ -40,7 +39,7 @@ func setupRouter(
 	router.Use(middleware.CORS())
 
 	// 5. 安全响应头中间件
-	router.Use(securityHeaders())
+	router.Use(middleware.SecurityHeaders())
 
 	// --- 公开路由 ---
 	router.GET("/health", healthHandler)
@@ -151,30 +150,5 @@ func readinessHandler(client *ent.Client, rdb *redis.Client) gin.HandlerFunc {
 			"service": "lagom-server",
 			"checks":  checks,
 		})
-	}
-}
-
-// structuredLogger 结构化请求日志中间件
-func structuredLogger() gin.HandlerFunc {
-	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		return fmt.Sprintf("%s | %3d | %13v | %15s | %-7s %s\n",
-			param.TimeStamp.Format("2006-01-02 15:04:05"),
-			param.StatusCode,
-			param.Latency,
-			param.ClientIP,
-			param.Method,
-			param.Path,
-		)
-	})
-}
-
-// securityHeaders 基础安全响应头中间件
-func securityHeaders() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Header("X-Content-Type-Options", "nosniff")
-		c.Header("X-Frame-Options", "DENY")
-		c.Header("X-XSS-Protection", "1; mode=block")
-		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
-		c.Next()
 	}
 }
