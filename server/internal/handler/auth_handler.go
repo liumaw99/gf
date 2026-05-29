@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log/slog"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lagom/lagom-server/internal/pkg/response"
 	"github.com/lagom/lagom-server/internal/service"
@@ -59,6 +61,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	u, pair, err := h.svc.Register(c.Request.Context(), req.Email, req.Password, req.Name)
 	if err != nil {
 		response.Fail(c, err)
+		slog.Error("register failed", "error", err)
 		return
 	}
 
