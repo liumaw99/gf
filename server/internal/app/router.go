@@ -11,6 +11,7 @@ import (
 	"github.com/lagom/lagom-server/internal/handler"
 	"github.com/lagom/lagom-server/internal/middleware"
 	"github.com/lagom/lagom-server/internal/pkg/redis"
+	"github.com/lagom/lagom-server/internal/pkg/response"
 )
 
 // setupRouter 配置完整路由和中间件链
@@ -49,7 +50,7 @@ func setupRouter(
 	{
 		// 公开 API
 		api.GET("/ping", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
+			response.Success(c, gin.H{
 				"message": "pong",
 				"time":    time.Now().Unix(),
 			})
@@ -84,10 +85,7 @@ func setupRouter(
 
 	// 404 处理
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"code":    404,
-			"message": "endpoint not found",
-		})
+		response.NotFound(c, "endpoint not found")
 	})
 
 	return router
@@ -95,7 +93,7 @@ func setupRouter(
 
 // healthHandler 存活检查 — 只要进程在运行即返回健康
 func healthHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+	response.Success(c, gin.H{
 		"status":    "healthy",
 		"service":   "lagom-server",
 		"timestamp": time.Now().Unix(),

@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/pkg/response"
 	"github.com/lagom/lagom-server/internal/service"
 )
 
@@ -19,25 +18,15 @@ func NewHabitHandler(svc *service.HabitService) *HabitHandler {
 
 // List 获取习惯列表
 func (h *HabitHandler) List(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"code":    0,
-		"message": "success",
-		"data":    []any{},
-	})
+	response.Success(c, []any{})
 }
 
 // Create 创建习惯
 func (h *HabitHandler) Create(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"code":    501,
-		"message": "not implemented",
-	})
+	response.NotImplemented(c, "")
 }
 
 // Complete 标记完成
 func (h *HabitHandler) Complete(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"code":    501,
-		"message": "not implemented",
-	})
+	response.NotImplemented(c, "")
 }

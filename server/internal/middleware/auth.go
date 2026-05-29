@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/pkg/response"
 )
 
 // JWTAuth JWT 认证中间件
@@ -12,19 +12,13 @@ func JWTAuth(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"code":    401,
-				"message": "missing authorization header",
-			})
+			response.Unauthorized(c, "missing authorization header")
 			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"code":    401,
-				"message": "invalid authorization format",
-			})
+			response.Unauthorized(c, "invalid authorization format")
 			return
 		}
 

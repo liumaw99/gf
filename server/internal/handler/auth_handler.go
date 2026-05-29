@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/lagom/lagom-server/internal/pkg/response"
 	"github.com/lagom/lagom-server/internal/service"
 )
 
@@ -19,24 +18,15 @@ func NewAuthHandler(svc *service.AuthService) *AuthHandler {
 
 // AppleSignIn Apple 登录
 func (h *AuthHandler) AppleSignIn(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"code":    501,
-		"message": "not implemented",
-	})
+	response.NotImplemented(c, "")
 }
 
 // GoogleSignIn Google 登录
 func (h *AuthHandler) GoogleSignIn(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"code":    501,
-		"message": "not implemented",
-	})
+	response.NotImplemented(c, "")
 }
 
 // RefreshToken 刷新 Token
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"code":    501,
-		"message": "not implemented",
-	})
+	response.NotImplemented(c, "")
 }
