@@ -9,6 +9,7 @@ import (
 	"github.com/lagom/lagom-server/config"
 	"github.com/lagom/lagom-server/ent"
 	"github.com/lagom/lagom-server/internal/handler"
+	"github.com/lagom/lagom-server/internal/pkg/redis"
 )
 
 // App 应用程序
@@ -17,12 +18,14 @@ type App struct {
 	server *http.Server
 	cfg    *config.Config
 	client *ent.Client
+	redis  *redis.Client
 }
 
 // New 创建应用实例（由 Wire 注入依赖）
 func New(
 	cfg *config.Config,
 	client *ent.Client,
+	rdb *redis.Client,
 	authHandler *handler.AuthHandler,
 	chatHandler *handler.ChatHandler,
 	habitHandler *handler.HabitHandler,
@@ -40,6 +43,7 @@ func New(
 		router: router,
 		cfg:    cfg,
 		client: client,
+		redis:  rdb,
 		server: &http.Server{
 			Addr:    fmt.Sprintf(":%d", cfg.Server.Port),
 			Handler: router,
@@ -54,6 +58,9 @@ func (a *App) Run() error {
 
 // Shutdown 优雅关闭
 func (a *App) Shutdown(ctx context.Context) error {
+	if a.redis != nil {
+		a.redis.Close()
+	}
 	if a.client != nil {
 		a.client.Close()
 	}

@@ -14,6 +14,7 @@ import (
 	"github.com/lagom/lagom-server/internal/handler"
 	"github.com/lagom/lagom-server/internal/pkg/ai"
 	"github.com/lagom/lagom-server/internal/pkg/jwt"
+	"github.com/lagom/lagom-server/internal/pkg/redis"
 	"github.com/lagom/lagom-server/internal/service"
 )
 
@@ -33,6 +34,11 @@ func InitializeApp() (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	redisConfig := ProvideRedisConfig(configConfig)
+	redisClient, err := redis.New(redisConfig)
+	if err != nil {
+		return nil, err
+	}
 	authService := service.NewAuthService(configConfig, client)
 	authHandler := handler.NewAuthHandler(authService)
 	deepSeekClient := ProvideDeepSeekClient(configConfig)
@@ -42,7 +48,7 @@ func InitializeApp() (*App, error) {
 	habitHandler := handler.NewHabitHandler(habitService)
 	characterService := service.NewCharacterService(configConfig, client)
 	characterHandler := handler.NewCharacterHandler(characterService)
-	app := New(configConfig, client, authHandler, chatHandler, habitHandler, characterHandler)
+	app := New(configConfig, client, redisClient, authHandler, chatHandler, habitHandler, characterHandler)
 	return app, nil
 }
 
@@ -63,9 +69,15 @@ func ProvideDeepSeekClient(cfg *config.Config) *ai.DeepSeekClient {
 	return ai.NewDeepSeekClient(cfg.AI.DeepSeekKey)
 }
 
+// ProvideRedisConfig 提取 Redis 配置
+func ProvideRedisConfig(cfg *config.Config) *config.RedisConfig {
+	return &cfg.Redis
+}
+
 // AppSet 是完整的应用依赖集合
 var AppSet = wire.NewSet(config.Load, ProvideEntClient,
 
 	ProvideJWTManager,
-	ProvideDeepSeekClient, service.NewAuthService, service.NewAIService, service.NewHabitService, service.NewCharacterService, handler.NewAuthHandler, handler.NewChatHandler, handler.NewHabitHandler, handler.NewCharacterHandler, New,
+	ProvideDeepSeekClient,
+	ProvideRedisConfig, redis.New, service.NewAuthService, service.NewAIService, service.NewHabitService, service.NewCharacterService, handler.NewAuthHandler, handler.NewChatHandler, handler.NewHabitHandler, handler.NewCharacterHandler, New,
 )

@@ -10,6 +10,7 @@ import (
 	"github.com/lagom/lagom-server/internal/handler"
 	"github.com/lagom/lagom-server/internal/pkg/ai"
 	"github.com/lagom/lagom-server/internal/pkg/jwt"
+	"github.com/lagom/lagom-server/internal/pkg/redis"
 	"github.com/lagom/lagom-server/internal/service"
 	"entgo.io/ent/dialect"
 	_ "github.com/lib/pq"
@@ -30,6 +31,11 @@ func ProvideDeepSeekClient(cfg *config.Config) *ai.DeepSeekClient {
 	return ai.NewDeepSeekClient(cfg.AI.DeepSeekKey)
 }
 
+// ProvideRedisConfig 提取 Redis 配置
+func ProvideRedisConfig(cfg *config.Config) *config.RedisConfig {
+	return &cfg.Redis
+}
+
 // AppSet 是完整的应用依赖集合
 var AppSet = wire.NewSet(
 	// Config
@@ -41,6 +47,8 @@ var AppSet = wire.NewSet(
 	// Utilities
 	ProvideJWTManager,
 	ProvideDeepSeekClient,
+	ProvideRedisConfig,
+	redis.New,
 
 	// Services
 	service.NewAuthService,
