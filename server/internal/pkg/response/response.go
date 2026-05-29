@@ -1,4 +1,10 @@
 // Package response 提供统一的 HTTP JSON 响应封装。
+//
+// 设计原则：所有响应（包括错误）统一返回 HTTP 200，业务状态通过 body 中的 code 区分。
+// 业务码规则：
+//   - 0        = 成功
+//   - 1001-1099 = 通用错误
+//   - 各模块自行扩展
 package response
 
 import (
@@ -29,50 +35,45 @@ func extractRequestID(c *gin.Context) string {
 	return c.GetHeader("X-Request-ID")
 }
 
-// Success 返回 200 成功响应，携带数据。
+// write 统一写入响应（HTTP 200 + JSON body）。
+func write(c *gin.Context, code int, message string, data any) {
+	c.JSON(http.StatusOK, Response{
+		Code:      code,
+		Message:   message,
+		Data:      data,
+		RequestID: extractRequestID(c),
+	})
+}
+
+// --- 成功响应 ---
+
+// Success 返回成功响应，携带数据。
 func Success(c *gin.Context, data any) {
-	c.JSON(http.StatusOK, Response{
-		Code:      0,
-		Message:   "success",
-		Data:      data,
-		RequestID: extractRequestID(c),
-	})
+	write(c, 0, "success", data)
 }
 
-// OK 返回 200 成功响应，无数据。
+// OK 返回成功响应，无数据。
 func OK(c *gin.Context) {
-	c.JSON(http.StatusOK, Response{
-		Code:      0,
-		Message:   "success",
-		RequestID: extractRequestID(c),
-	})
+	write(c, 0, "success", nil)
 }
 
-// Created 返回 201 创建成功响应。
+// Created 返回创建成功响应。
 func Created(c *gin.Context, data any) {
-	c.JSON(http.StatusCreated, Response{
-		Code:      0,
-		Message:   "created",
-		Data:      data,
-		RequestID: extractRequestID(c),
-	})
+	write(c, 0, "created", data)
 }
 
 // Page 返回分页数据响应。
 func Page(c *gin.Context, list any, total int64) {
-	c.JSON(http.StatusOK, Response{
-		Code:    0,
-		Message: "success",
-		Data: gin.H{
-			"list":  list,
-			"total": total,
-		},
-		RequestID: extractRequestID(c),
+	write(c, 0, "success", gin.H{
+		"list":  list,
+		"total": total,
 	})
 }
 
+// --- 错误响应 ---
+
 // Fail 返回错误响应，自动解析 *errors.AppError。
-// 如果不是 *AppError，则 fallback 到 500 内部错误。
+// 如果不是 *AppError，则 fallback 到内部错误。
 func Fail(c *gin.Context, err error) {
 	if err == nil {
 		OK(c)
@@ -80,122 +81,78 @@ func Fail(c *gin.Context, err error) {
 	}
 
 	if ae, ok := errors.IsAppError(err); ok {
-		c.JSON(ae.Status, Response{
-			Code:      ae.Code,
-			Message:   ae.Message,
-			RequestID: extractRequestID(c),
-		})
+		write(c, ae.Code, ae.Message, nil)
 		return
 	}
 
-	c.JSON(http.StatusInternalServerError, Response{
-		Code:      errors.ErrInternal.Code,
-		Message:   errors.ErrInternal.Message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrInternal.Code, errors.ErrInternal.Message, nil)
 }
 
-// FailWithCode 返回指定业务码和消息的错误响应，HTTP 状态码 400。
+// FailWithCode 返回指定业务码和消息的错误响应。
 func FailWithCode(c *gin.Context, code int, message string) {
-	c.JSON(http.StatusBadRequest, Response{
-		Code:      code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, code, message, nil)
 }
 
-// BadRequest 返回 400 参数错误。
+// BadRequest 返回参数错误。
 func BadRequest(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrBadRequest.Message
 	}
-	c.JSON(http.StatusBadRequest, Response{
-		Code:      errors.ErrBadRequest.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrBadRequest.Code, message, nil)
 }
 
-// Unauthorized 返回 401 未授权。
+// Unauthorized 返回未授权错误。
 func Unauthorized(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrUnauthorized.Message
 	}
-	c.AbortWithStatusJSON(http.StatusUnauthorized, Response{
-		Code:      errors.ErrUnauthorized.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrUnauthorized.Code, message, nil)
 }
 
-// Forbidden 返回 403 禁止访问。
+// Forbidden 返回禁止访问错误。
 func Forbidden(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrForbidden.Message
 	}
-	c.AbortWithStatusJSON(http.StatusForbidden, Response{
-		Code:      errors.ErrForbidden.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrForbidden.Code, message, nil)
 }
 
-// NotFound 返回 404 资源不存在。
+// NotFound 返回资源不存在错误。
 func NotFound(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrNotFound.Message
 	}
-	c.AbortWithStatusJSON(http.StatusNotFound, Response{
-		Code:      errors.ErrNotFound.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrNotFound.Code, message, nil)
 }
 
-// Conflict 返回 409 资源冲突。
+// Conflict 返回资源冲突错误。
 func Conflict(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrConflict.Message
 	}
-	c.AbortWithStatusJSON(http.StatusConflict, Response{
-		Code:      errors.ErrConflict.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrConflict.Code, message, nil)
 }
 
-// InternalError 返回 500 内部错误。
+// InternalError 返回内部错误。
 func InternalError(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrInternal.Message
 	}
-	c.AbortWithStatusJSON(http.StatusInternalServerError, Response{
-		Code:      errors.ErrInternal.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrInternal.Code, message, nil)
 }
 
-// NotImplemented 返回 501 功能未实现。
+// NotImplemented 返回功能未实现错误。
 func NotImplemented(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrNotImplemented.Message
 	}
-	c.JSON(http.StatusNotImplemented, Response{
-		Code:      errors.ErrNotImplemented.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrNotImplemented.Code, message, nil)
 }
 
-// TooManyRequests 返回 429 请求过于频繁。
+// TooManyRequests 返回请求过于频繁错误。
 func TooManyRequests(c *gin.Context, message string) {
 	if message == "" {
 		message = errors.ErrTooManyRequests.Message
 	}
-	c.AbortWithStatusJSON(http.StatusTooManyRequests, Response{
-		Code:      errors.ErrTooManyRequests.Code,
-		Message:   message,
-		RequestID: extractRequestID(c),
-	})
+	write(c, errors.ErrTooManyRequests.Code, message, nil)
 }

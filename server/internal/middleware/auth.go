@@ -13,12 +13,14 @@ func JWTAuth(secret string) gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			response.Unauthorized(c, "missing authorization header")
+			c.Abort()
 			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" {
 			response.Unauthorized(c, "invalid authorization format")
+			c.Abort()
 			return
 		}
 
