@@ -2,110 +2,163 @@ package config
 
 import (
 	"fmt"
-	"os"
-	"strconv"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
-// Config 应用配置
+// Config 应用配置根结构
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	Redis    RedisConfig
-	JWT      JWTConfig
-	AI       AIConfig
+	Server   ServerConfig   `mapstructure:"server"`
+	Database DatabaseConfig `mapstructure:"database"`
+	Redis    RedisConfig    `mapstructure:"redis"`
+	JWT      JWTConfig      `mapstructure:"jwt"`
+	AI       AIConfig       `mapstructure:"ai"`
+	OAuth    OAuthConfig    `mapstructure:"oauth"`
 }
 
 // ServerConfig 服务配置
 type ServerConfig struct {
-	Port int
-	Mode string // debug / release
+	Port int    `mapstructure:"port"`
+	Mode string `mapstructure:"mode"` // debug / release
 }
 
 // DatabaseConfig 数据库配置
 type DatabaseConfig struct {
-	DSN            string
-	MaxOpenConns   int
-	MaxIdleConns   int
-	MaxLifetimeSec int
+	DSN            string `mapstructure:"dsn"`
+	MaxOpenConns   int    `mapstructure:"max_open_conns"`
+	MaxIdleConns   int    `mapstructure:"max_idle_conns"`
+	MaxLifetimeSec int    `mapstructure:"max_lifetime_sec"`
 }
 
 // RedisConfig Redis 配置
 type RedisConfig struct {
-	Addr     string
-	Password string
-	DB       int
+	Addr     string `mapstructure:"addr"`
+	Password string `mapstructure:"password"`
+	DB       int    `mapstructure:"db"`
 }
 
 // JWTConfig JWT 配置
 type JWTConfig struct {
-	Secret     string
-	AccessTTL  int // minutes
-	RefreshTTL int // hours
+	Secret     string `mapstructure:"secret"`
+	AccessTTL  int    `mapstructure:"access_ttl_min"`  // minutes
+	RefreshTTL int    `mapstructure:"refresh_ttl_hour"` // hours
 }
 
 // AIConfig AI 服务配置
 type AIConfig struct {
-	DeepSeekKey string
-	FallbackKey string
-	MaxTokens   int
-	Temperature float64
+	DeepSeekKey string  `mapstructure:"deepseek_key"`
+	FallbackKey string  `mapstructure:"fallback_key"`
+	MaxTokens   int     `mapstructure:"max_tokens"`
+	Temperature float64 `mapstructure:"temperature"`
 }
 
-// Load 从环境变量加载配置
+// OAuthConfig OAuth2 配置
+type OAuthConfig struct {
+	Apple  AppleOAuthConfig  `mapstructure:"apple"`
+	Google GoogleOAuthConfig `mapstructure:"google"`
+}
+
+// AppleOAuthConfig Apple Sign In 配置
+type AppleOAuthConfig struct {
+	ClientID   string `mapstructure:"client_id"`
+	TeamID     string `mapstructure:"team_id"`
+	KeyID      string `mapstructure:"key_id"`
+	PrivateKey string `mapstructure:"private_key"`
+}
+
+// GoogleOAuthConfig Google Sign In 配置
+type GoogleOAuthConfig struct {
+	ClientID     string `mapstructure:"client_id"`
+	ClientSecret string `mapstructure:"client_secret"`
+}
+
+// Load 加载配置
+// 优先级：环境变量 > .env 文件 > config.yaml > 默认值
 func Load() (*Config, error) {
-	return &Config{
-		Server: ServerConfig{
-			Port: getEnvInt("SERVER_PORT", 8080),
-			Mode: getEnv("SERVER_MODE", "debug"),
-		},
-		Database: DatabaseConfig{
-			DSN:            getEnv("DATABASE_DSN", "postgres://lagom:lagom@localhost:5432/lagom?sslmode=disable"),
-			MaxOpenConns:   getEnvInt("DB_MAX_OPEN_CONNS", 25),
-			MaxIdleConns:   getEnvInt("DB_MAX_IDLE_CONNS", 5),
-			MaxLifetimeSec: getEnvInt("DB_MAX_LIFETIME_SEC", 3600),
-		},
-		Redis: RedisConfig{
-			Addr:     getEnv("REDIS_ADDR", "localhost:6379"),
-			Password: getEnv("REDIS_PASSWORD", ""),
-			DB:       getEnvInt("REDIS_DB", 0),
-		},
-		JWT: JWTConfig{
-			Secret:     getEnv("JWT_SECRET", "lagom-dev-secret-change-in-production"),
-			AccessTTL:  getEnvInt("JWT_ACCESS_TTL_MIN", 15),
-			RefreshTTL: getEnvInt("JWT_REFRESH_TTL_HOUR", 168), // 7 days
-		},
-		AI: AIConfig{
-			DeepSeekKey: getEnv("DEEPSEEK_API_KEY", ""),
-			FallbackKey: getEnv("OPENAI_API_KEY", ""),
-			MaxTokens:   getEnvInt("AI_MAX_TOKENS", 300),
-			Temperature: getEnvFloat("AI_TEMPERATURE", 0.7),
-		},
-	}, nil
+	v := viper.New()
+
+	// 1. 设置默认值
+	setDefaults(v)
+
+	// 2. 读取 .env 文件（如果存在）
+	v.SetConfigFile(".env")
+	_ = v.ReadInConfig() // 忽略错误，.env 是可选的
+
+	// 3. 读取 config.yaml
+	v.SetConfigName("config")
+	v.SetConfigType("yaml")
+	v.AddConfigPath(".")
+	v.AddConfigPath("./config")
+	_ = v.ReadInConfig() // 忽略错误，config.yaml 是可选的
+
+	// 4. 环境变量覆盖（最高优先级）
+	// 格式：LAGOM_SERVER_PORT, LAGOM_DATABASE_DSN
+	v.SetEnvPrefix("LAGOM")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
+
+	// 5. 解析到结构体
+	var cfg Config
+	if err := v.Unmarshal(&cfg); err != nil {
+		return nil, fmt.Errorf("unmarshal config: %w", err)
+	}
+
+	// 6. 从独立环境变量读取敏感配置（不通过 viper 前缀）
+	readSensitiveEnv(&cfg)
+
+	return &cfg, nil
 }
 
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
+// setDefaults 设置默认值
+func setDefaults(v *viper.Viper) {
+	// Server
+	v.SetDefault("server.port", 8080)
+	v.SetDefault("server.mode", "debug")
+
+	// Database
+	v.SetDefault("database.dsn", "postgres://lagom:lagom@localhost:5432/lagom?sslmode=disable")
+	v.SetDefault("database.max_open_conns", 25)
+	v.SetDefault("database.max_idle_conns", 5)
+	v.SetDefault("database.max_lifetime_sec", 3600)
+
+	// Redis
+	v.SetDefault("redis.addr", "localhost:6379")
+	v.SetDefault("redis.password", "")
+	v.SetDefault("redis.db", 0)
+
+	// JWT
+	v.SetDefault("jwt.secret", "lagom-dev-secret-change-in-production")
+	v.SetDefault("jwt.access_ttl_min", 15)
+	v.SetDefault("jwt.refresh_ttl_hour", 168)
+
+	// AI
+	v.SetDefault("ai.max_tokens", 300)
+	v.SetDefault("ai.temperature", 0.7)
 }
 
-func getEnvInt(key string, defaultValue int) int {
-	if value := os.Getenv(key); value != "" {
-		if i, err := strconv.Atoi(value); err == nil {
-			return i
-		}
+// readSensitiveEnv 从独立环境变量读取敏感配置
+func readSensitiveEnv(cfg *Config) {
+	// AI Keys
+	if v := viper.GetString("DEEPSEEK_API_KEY"); v != "" {
+		cfg.AI.DeepSeekKey = v
 	}
-	return defaultValue
-}
+	if v := viper.GetString("OPENAI_API_KEY"); v != "" {
+		cfg.AI.FallbackKey = v
+	}
 
-func getEnvFloat(key string, defaultValue float64) float64 {
-	if value := os.Getenv(key); value != "" {
-		if f, err := strconv.ParseFloat(value, 64); err == nil {
-			return f
-		}
+	// OAuth Secrets
+	if v := viper.GetString("GOOGLE_CLIENT_SECRET"); v != "" {
+		cfg.OAuth.Google.ClientSecret = v
 	}
-	return defaultValue
+	if v := viper.GetString("APPLE_PRIVATE_KEY"); v != "" {
+		cfg.OAuth.Apple.PrivateKey = v
+	}
+
+	// Database password from dedicated env (extract from DSN or separate)
+	if v := viper.GetString("DB_PASSWORD"); v != "" {
+		cfg.Database.DSN = strings.ReplaceAll(cfg.Database.DSN, ":lagom@", ":"+v+"@")
+	}
 }
 
 // Validate 验证配置
@@ -119,4 +172,14 @@ func (c *Config) Validate() error {
 		}
 	}
 	return nil
+}
+
+// IsDebug 是否调试模式
+func (c *Config) IsDebug() bool {
+	return c.Server.Mode == "debug"
+}
+
+// IsRelease 是否生产模式
+func (c *Config) IsRelease() bool {
+	return c.Server.Mode == "release"
 }

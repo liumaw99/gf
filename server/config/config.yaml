@@ -1,5 +1,16 @@
-# Lagom Server 配置文件模板
-# 生产环境请使用环境变量覆盖
+# ============================================
+# Lagom Server 配置文件
+# ============================================
+# 配置优先级（从高到低）：
+# 1. 环境变量（LAGOM_* 或独立变量如 DEEPSEEK_API_KEY）
+# 2. .env 文件
+# 3. 本配置文件
+# 4. 代码默认值
+#
+# 生产环境建议：
+# - 敏感信息使用环境变量
+# - 非敏感配置使用本文件
+# ============================================
 
 server:
   port: 8080
@@ -22,7 +33,17 @@ jwt:
   refresh_ttl_hour: 168  # 7 days
 
 ai:
-  deepseek_key: ""      # 从环境变量 DEEPSEEK_API_KEY 读取
-  fallback_key: ""      # 从环境变量 OPENAI_API_KEY 读取
+  deepseek_key: ""      # 优先从环境变量 DEEPSEEK_API_KEY 读取
+  fallback_key: ""      # 优先从环境变量 OPENAI_API_KEY 读取
   max_tokens: 300
   temperature: 0.7
+
+oauth:
+  apple:
+    client_id: "com.lagom.app"
+    team_id: ""
+    key_id: ""
+    private_key: ""     # 优先从环境变量 APPLE_PRIVATE_KEY 读取
+  google:
+    client_id: ""
+    client_secret: ""   # 优先从环境变量 GOOGLE_CLIENT_SECRET 读取
