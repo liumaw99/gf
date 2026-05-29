@@ -450,7 +450,7 @@ data: {"type":"done"}
 
 ### 6.4 Postman Collection 维护规范
 
-**文件位置**：`docs/Lagom-Auth-API.postman_collection.json`
+**文件位置**：`docs/Lagom-API.postman_collection.json`
 
 **触发条件**：以下任一情况发生时，**必须同步更新** Postman Collection：
 - 新增/删除/修改路由（URL、Method）
