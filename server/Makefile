@@ -65,6 +65,28 @@ docker-build:
 docker-run:
 	docker-compose up --build
 
+# 本地开发依赖（PostgreSQL + Redis）
+dev-up:
+	@docker compose -f docker-compose.dev.yml up -d
+	@echo "⏳ 等待服务就绪..."
+	@sleep 3
+	@docker compose -f docker-compose.dev.yml ps
+	@echo "✅ dev 环境已启动"
+
+dev-down:
+	@docker compose -f docker-compose.dev.yml down
+	@echo "🛑 dev 环境已停止"
+
+dev-logs:
+	@docker compose -f docker-compose.dev.yml logs -f
+
+dev-ps:
+	@docker compose -f docker-compose.dev.yml ps
+
+dev-reset:
+	@docker compose -f docker-compose.dev.yml down -v
+	@echo "🗑️  dev 数据卷已清除，下次启动将重新初始化"
+
 # 依赖管理
 deps:
 	go mod tidy

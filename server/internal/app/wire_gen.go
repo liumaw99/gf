@@ -7,7 +7,9 @@
 package app
 
 import (
+	"context"
 	"entgo.io/ent/dialect"
+	"fmt"
 	"github.com/google/wire"
 	"github.com/lagom/lagom-server/config"
 	"github.com/lagom/lagom-server/ent"
@@ -56,8 +58,18 @@ func InitializeApp() (*App, error) {
 // wire.go:
 
 // ProvideEntClient 提供 ent 数据库客户端
+// 开发模式下自动创建 Schema，生产模式需手动执行 migration
 func ProvideEntClient(cfg *config.Config) (*ent.Client, error) {
-	return ent.Open(dialect.Postgres, cfg.Database.DSN)
+	client, err := ent.Open(dialect.Postgres, cfg.Database.DSN)
+	if err != nil {
+		return nil, err
+	}
+	if cfg.Server.Mode != "release" {
+		if err := client.Schema.Create(context.Background()); err != nil {
+			return nil, fmt.Errorf("auto create schema: %w", err)
+		}
+	}
+	return client, nil
 }
 
 // ProvideJWTManager 提供 JWT 管理器

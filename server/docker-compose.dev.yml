@@ -1,0 +1,42 @@
+# ============================================
+# Lagom 本地开发环境依赖
+# 仅启动 PostgreSQL + Redis，服务本身用 go run 启动
+# ============================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lagom-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lagom
+      POSTGRES_PASSWORD: lagom
+      POSTGRES_DB: lagom
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lagom"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: lagom-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_dev_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
